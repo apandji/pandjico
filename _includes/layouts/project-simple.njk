@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Color Scroller — Andrew Pandji</title>
-    
-    <meta name="description" content="Scroll until stopping feels inevitable — then notice what the interface trained you to do." />
-    
+    <title>{{ title }} — Andrew Pandji</title>
+    {% if description %}
+    <meta name="description" content="{{ description }}" />
+    {% endif %}
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
     <main class="project-page">
         <p class="project-page__back"><a href="index.html">All works</a></p>
-        <h1>Color Scroller</h1>
-        <p>Case study stub — same project as the home card.</p>
-<p>Replace this with narrative, process, and credits when you are ready.</p>
-
+        <h1>{{ title }}</h1>
+        {{ content | safe }}
     </main>
     <script src="../js/register-sw.js" defer></script>
 </body>

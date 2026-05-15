@@ -124,8 +124,11 @@
         bar.style.setProperty("--station-day-pct", String(p));
         marker.style.left = p + "%";
         if (tip) {
-            tip.style.left = p + "%";
-            syncTipAlign(p);
+            if (tip.getAttribute("aria-hidden") === "false") {
+                syncTipAlign(p);
+            } else {
+                tip.style.left = p + "%";
+            }
         }
     }
 
@@ -262,7 +265,7 @@
             releaseToLive();
         });
 
-        bar.addEventListener("keydown", function (e) {
+        track.addEventListener("keydown", function (e) {
             if (!sky()) {
                 return;
             }

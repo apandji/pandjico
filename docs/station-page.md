@@ -2,7 +2,7 @@
 
 **Feature:** `/station` — the living interior of pandji.co  
 **Implementation file (static site):** `station.html` at repo root (GitHub Pages: `…/pandjico/station.html`)  
-**Status:** Shell shipped (hero palette + footer + placeholder copy). **This doc is the build spec.**  
+**Status:** **Phase A in progress** — three-column copy, sticky toolbar, readings, sky toggle, 24h day bar (scrub + palette tooltip), sitemap, footer presence, hero/⁘ entry. **Not yet:** full sky instrument panel (§7.1), instruments prose list (§7.3).  
 **Queue:** [next-actions.md](./next-actions.md)
 
 **Related docs**
@@ -125,7 +125,7 @@ Sky panel, sitemap, presence, music — still in PRD; add above or below columns
 | Background | Current scene `--bg-*` from `adapt-hero.js` (same as site) |
 | Location line | e.g. `Current location: St. Louis, Missouri` — left, muted `~0.8rem` |
 | Time + weather | Right-aligned: clock, period label (Morning), temp · conditions — tabular figures |
-| **24-hour bar** | Full-width 2px gradient (midnight → dawn → noon → dusk → midnight); marker at `(hour×60+minute)/1440` |
+| **24-hour bar** | Shipped in toolbar: 1px muted track, 5px marker, idle hint, scrub + palette tooltip (`station-day-bar.js`). PRD gradient strip optional later. |
 | Data source | Reuse footer caption / scene state — do not duplicate weather fetch |
 | CSS vars | Expose or derive `--sky-midnight`, `--sky-dawn`, `--sky-noon`, `--sky-dusk` from palette logic (or approximate from hourly samples in `adapt-hero.js`) |
 | Ambient toggle | Corner control: `♦ ambient` / `◆ ambient` (pulse when active) — **Phase 2** with Tone.js |
@@ -280,7 +280,7 @@ elsewhere
 |------|-------------|
 | **HTML** | `station.html`; `data-appearance` + theme-color + favicon pattern match home |
 | **CSS** | Extend `css/styles.css` — `.station-page`, `.station-sky-panel`, `.transmission`, `.station-sitemap`, `.station-presence`; reuse `.hero` accent/prose tokens where appropriate |
-| **JS** | `adapt-hero.js` (required); new `js/station-page.js` optional for day-bar marker + presence only |
+| **JS** | `adapt-hero.js`, `station-toolbar.js`, `station-day-bar.js` (day bar); presence in HTML for now |
 | **SW** | Add `station.html` + any new assets to `sw.js` `PRECACHE_REL`; bump `STATIC_CACHE` |
 | **A11y** | Skip link, heading hierarchy, focus styles on links, no autoplay audio |
 | **HTTPS** | Required for geo on Sky toggle (same as site) |
@@ -314,16 +314,16 @@ elsewhere
 
 | Step | Task | Done when |
 |------|------|-----------|
-| A1 | `station.html` structure + sections 2–4, 6 copy in place | No lorem |
-| A2 | Sky panel §7.1 — location/time/weather from existing caption APIs | Matches footer data |
-| A3 | 24-hour bar + marker | Marker position correct at load + tick |
-| A4 | Transmission block §7.2 — locked copy + datestamp | Matches §7.2 |
-| A5 | Instruments list §7.3 incl. Collections | Links correct |
-| A6 | Author block §7.4 | Links to `index.html` |
-| A7 | Sitemap §7.6 | All live routes work on GH Pages |
-| A8 | Presence §7.7 hardcoded + shared footer | Footer parity with home |
-| A9 | Hero + **⁘** → `station.html` | Relative `station.html` |
-| A10 | `sw.js` precache bump | Deploy verified |
+| A1 | `station.html` structure + sections 2–4, 6 copy in place | ✅ |
+| A2 | Sky panel §7.1 — location/time/weather from existing caption APIs | Partial — readings + toggle in toolbar; no ~30–40svh panel |
+| A3 | 24-hour bar + marker | ✅ toolbar bar: hint, 5px dot, scrub, palette tooltip (`js/station-day-bar.js`) |
+| A4 | Transmission block §7.2 — locked copy + datestamp | ✅ |
+| A5 | Instruments list §7.3 incl. Collections | Partial — sitemap only; prose instrument table not in column |
+| A6 | Author block §7.4 | ✅ (links overlap sitemap — optional trim) |
+| A7 | Sitemap §7.6 | ✅ |
+| A8 | Presence §7.7 hardcoded + shared footer | ✅ |
+| A9 | Hero + **⁘** → `station.html` | ✅ |
+| A10 | `sw.js` precache bump | ✅ local (`pandjico-static-62`); verify after deploy |
 
 ### Phase B — Enhancement
 

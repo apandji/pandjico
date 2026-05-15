@@ -110,7 +110,15 @@
                 </div>
                 <div class="station-day-bar" id="station-day-bar">
                     <p class="station-day-bar__hint" id="station-day-hint" aria-live="polite"></p>
-                    <div class="station-day-bar__track" id="station-day-track">
+                    <div
+                        class="station-day-bar__track"
+                        id="station-day-track"
+                        tabindex="0"
+                        role="slider"
+                        aria-valuemin="0"
+                        aria-valuemax="24"
+                        aria-label="Time of day"
+                    >
                         <button
                             type="button"
                             class="station-day-bar__marker"

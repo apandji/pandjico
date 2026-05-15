@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" data-appearance="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{{ title }} — Andrew Pandji</title>
+    {% if description %}
+    <meta name="description" content="{{ description }}" />
+    {% endif %}
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <main class="project-page project-page--case">
+        <p class="project-page__back"><a href="../index.html">Index</a></p>
+        <p class="project-page__meta">{{ meta }}</p>
+        <h1>{{ title }}</h1>
+        <p class="project-page__lede">{{ lede }}</p>
+
+        {{ content | safe }}
+
+        <p class="project-page__back project-page__back--end">
+            <a href="../index.html">← Back to the station</a>
+        </p>
+    </main>
+    <script src="../js/register-sw.js" defer></script>
+</body>
+</html>

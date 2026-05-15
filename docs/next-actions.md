@@ -2,38 +2,57 @@
 
 **This file is the single queue** for what to do next on the site. When you work with Cursor remotely, open or @-mention this doc first so work stays ordered and traceable.
 
-**Doc map:** [README.md](./README.md) · [STATION.md](../STATION.md) · **North star:** [station-concept-and-critique.md](./station-concept-and-critique.md) · **Station page PRD:** [station-page.md](./station-page.md) · **Mobile:** [mobile-spec.md](./mobile-spec.md) · **Longwave:** [project-longwave.md](./project-longwave.md)
+**Doc map:** [README.md](./README.md) · [case-studies-11ty.md](./case-studies-11ty.md) · [STATION.md](../STATION.md) · [station-concept-and-critique.md](./station-concept-and-critique.md) · [station-page.md](./station-page.md) · [mobile-spec.md](./mobile-spec.md)
 
-Long specs live elsewhere; **done spec lines** are crossed off in those files (for example [instrument-collections.md](./instrument-collections.md)), not duplicated here.
+Long specs live elsewhere; **done** lines are struck in feature docs or logged in **Done (recent)**—not duplicated here.
 
 ---
 
 ## Using this with Cursor
 
 - Keep **numbered items** under **Active** in priority order (1 = next unless you say otherwise).
-- When something ships, **move it to “Done (recent)”** with a one-line summary and date, or strike it in the feature doc if it was spec-only.
-- For larger work, add a **link to the feature doc** here instead of pasting the whole spec.
+- When something ships, **move it to “Done (recent)”** with a one-line summary and date.
+- For larger work, **link to the feature doc** instead of pasting the whole spec.
+
+---
+
+## Case studies (11ty — next)
+
+**Guide:** [case-studies-11ty.md](./case-studies-11ty.md).
+
+| # | Step |
+|---|------|
+| 1 | **Write:** edit `content/projects/synek-launch.md`, `sensory-language.md`, `adaptive-interfaces.md` |
+| 2 | **Preview:** `npm run serve` |
+| 3 | **Ship:** `npm run build` before commit (syncs HTML into `projects/`) |
+| 4 | New slug → add `.md`, `permalink`, **`scripts/sync-built-projects.js`** `SLUGS`, **`projects.json`**, **`sw.js` precache** if needed |
+| 5 | *(Stretch)* Generate `projects/projects.json` from front matter |
+
+**Park:** Tina/Decap/Sanity · GitHub Actions → `_site/` only.
 
 ---
 
 ## Bugs
 
-- **Works rail at scroll=0** — At every viewport size, initial load / `scrollY === 0` should snap or align so the **first work card** in the rail is the active item (not a later card from scroll-attention math or split-layout offset).
-- **Mobile polish (rough pass)** — Needs a dedicated polish pass on small viewports. Known rough edges from QA: wrong section order at top (logos/CTAs before hero), clipped client logos, large dead gaps, hero pushed to bottom, desktop split layout bleeding through. Track against [mobile-spec.md](./mobile-spec.md).
-- **Hero client logos** — Mobile `filter` override removed. Light idle: `soft-light` restored (opacity ~0.62 vs pre-mobile 0.57). Logos moved out of `<section class="hero">` for flex order — revisit if blend reads wrong on some skies.
+- **Station day bar tooltip** — Re-check left/right clamp on narrow viewports at 0% / 100%.
+- **Works rail at scroll=0** — First card should be active at `scrollY === 0`.
+- **Mobile polish** — [mobile-spec.md](./mobile-spec.md).
+- **Hero client logos** — Blend/opacity on some skies after flex reorder.
 
 ---
 
-## Active
+## Active (after tonight’s session)
 
-1. **Mobile experience (polish)** — First pass shipped (sky band, scroll order, tall cards, contact band, overscroll tray, single-tap). Still to tune: scroll-snap, card entrance IO, lazy video `preload="none"`. [mobile-spec.md](./mobile-spec.md).
-2. **Live smoke (HTTPS)** — On https://apandji.github.io/pandjico/ : footer sky toggle; **⁘** or `?lab=1` then random city (place, time, weather). See [github-pages.md](./github-pages.md) for deploy + `STATIC_CACHE` bumps.
-3. **CV** (`cv.html`) — Practice record voice, not résumé theater; PDF or structured page.
-4. **Case studies** — SYNEK template in place; flesh out metrics/media. Color Scroller + Ascension still stubs.
-5. **Contact** — Confirm FormSubmit email (`hello@pandji.co` in `contact.html`) and test submit on device.
-6. **Station page** — Implement [station-page.md](./station-page.md) Phase A on `station.html` (sky panel, locked transmission, instruments, sitemap, presence). About: optional portrait on `about.html` (deeper than station author block).
-7. **Footer extras** — Decide what lives in `.time-footer__extras` (beyond **⁘** lab / scene-debug — station doc Part Three § Product themes).
-8. **Collections — media & layout QA** — Lazy video / `IntersectionObserver` for many masonry tiles; list layout QA on real devices; Grid L3 vs fallback. [instrument-collections.md](./instrument-collections.md) §9 / §15.
+1. **Case studies — content** — Write in `content/projects/*.md` (SYNEK, Color Scroller, Ascension stubs); **`npm run build`** before deploy. Metrics/outcomes still TBD on SYNEK.
+2. **11ty Phase 2** — `projects.json` + home rail from one data source; GH Pages Action → `_site/`. [case-studies-11ty.md](./case-studies-11ty.md) · [github-pages.md](./github-pages.md).
+3. **Optional CMS** — Tina or Decap after Markdown authoring feels good.
+4. **Mobile experience (polish)** — Scroll-snap, card IO, lazy video `preload="none"`. [mobile-spec.md](./mobile-spec.md).
+5. **Live smoke (HTTPS)** — Footer sky, **⁘** / `?lab=1` on GH Pages.
+6. **CV** (`cv.html`) — Practice record voice.
+7. **Contact** — Verify FormSubmit (`hello@pandji.co`).
+8. **Station page (finish Phase A)** — Sky panel §7.1, instruments prose §7.3. [station-page.md](./station-page.md).
+9. **Footer extras** — What lives in `.time-footer__extras`.
+10. **Collections QA** — Masonry video lazy-load, list layout on devices. [instrument-collections.md](./instrument-collections.md).
 
 ---
 
@@ -41,24 +60,26 @@ Long specs live elsewhere; **done spec lines** are crossed off in those files (f
 
 | Date | Item |
 |------|------|
-| 2026-05-14 | **All Works MVP** — `projects/index.html` + JSON + `works-index.js` + rail refresh. [instrument-collections.md](./instrument-collections.md). |
-| 2026-05-15 | **All Works v2** — Toolbar, masonry default, list, `?view=list`. [instrument-collections.md](./instrument-collections.md) §15. |
-| 2026-05-16 | **Collections mosaic + nav** — Spotlight, `desc`, view transitions, home toolbar tips; `STATIC_CACHE` bumps. |
-| 2026-05-16 | **Docs consolidation** — Station specs added; themes/stories folded into station doc Part Three; `instrument-collections.md`; [STATION.md](../STATION.md); queue trimmed. |
-| 2026-05-15 | **Station copy + mobile v1** — Hero position line; sky band; “where practice was applied”; mobile scroll flow + overscroll tray; single-tap cards. |
-| 2026-05-15 | **About + Contact** — Station-framed about page; FormSubmit contact form (`hello@pandji.co` — verify). |
-| 2026-05-15 | **SYNEK** — `synek-launch.html` case study template; redirect from `tactility-grounding.html`; home + `projects.json` updated. `STATIC_CACHE` → 43. |
+| 2026-05-17 | **11ty case studies scaffold** — `content/projects/*.md`, layouts, passthrough + `npm run build` → sync `projects/*.html`. |
+| 2026-05-15 | **Docs — case study path** — [case-studies-11ty.md](./case-studies-11ty.md) as session guide; README + queue reprioritized for 11ty. |
+| 2026-05-15 | **Station interior v1** — Toolbar, day bar, three columns, sitemap, **⁘** → station. `STATIC_CACHE` → 62. |
+| 2026-05-15 | **SYNEK** — `synek-launch.html` template; redirect from `tactility-grounding.html`. |
+| 2026-05-15 | **About + Contact** — Station-framed about; FormSubmit contact. |
+| 2026-05-15 | **Station copy + mobile v1** — Sky band, scroll flow, overscroll tray, single-tap cards. |
+| 2026-05-16 | **Docs consolidation** — Station specs; [STATION.md](../STATION.md). |
+| 2026-05-16 | **Collections mosaic + nav** — Spotlight, VT, toolbar tips. |
+| 2026-05-15 | **All Works v2** — Toolbar, masonry, list, `?view=list`. |
+| 2026-05-14 | **All Works MVP** — `projects/index.html` + JSON + `works-index.js`. |
 
 ---
 
-## Later (not the current queue)
+## Later
 
-- **Project Longwave / Transmissions** — [project-longwave.md](./project-longwave.md). After mobile + station copy land.
-- **Station Phase B** — Tone.js ambient, **⁘** → station, Presence from Supabase — [station-page.md](./station-page.md) §10.
-- **Trace · Presence · Webring** — Concept only (station doc Part One).
-- **11ty + optional CMS** — [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md).
-- **Collections Phase 2** — `audience` meta + `?audience=` presets ([instrument-collections.md](./instrument-collections.md) §2.1).
-- **GitHub Pages** — [github-pages.md](./github-pages.md) if not already configured.
+- **Project Longwave / Transmissions** — [project-longwave.md](./project-longwave.md)
+- **Station Phase B** — Tone.js, Presence from Supabase — [station-page.md](./station-page.md) §10
+- **Trace · Webring** — Concept only
+- **Collections Phase 2** — `audience` meta + `?audience=` — [instrument-collections.md](./instrument-collections.md) §2.1
+- **Sanity / Storyblok** — Only if Markdown + Tina/Decap aren’t enough — [case-studies-11ty.md](./case-studies-11ty.md)
 
 ---
 
