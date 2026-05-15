@@ -664,6 +664,15 @@ html[data-appearance="dark"] .work-card {
     color: hsl(220 5% 96% / 0.78);
 }
 
+.work-card__desc.work-card__desc--year {
+    margin: 0.35rem 0 0;
+    max-width: none;
+    font-size: var(--text-meta);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: hsl(220 5% 96% / 0.72);
+}
+
 .work-card__hint {
     display: none;
     margin: 0;
@@ -846,6 +855,941 @@ html[data-appearance="light"] .scene-arrow-link:focus-visible {
 
 .project-page__list a:hover {
     opacity: 1;
+}
+
+/* --- All works v2 (`projects/index.html`) --- */
+.works-page {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-width: min(100%, 92rem);
+    margin: 0 auto;
+    padding: var(--page-pad-top) max(1.25rem, env(safe-area-inset-left)) calc(var(--footer-band) + 2rem)
+        max(1.25rem, env(safe-area-inset-right));
+    background-color: hsl(var(--bg-h) var(--bg-s) var(--bg-l));
+    transition: background-color 0.95s var(--ease-scene);
+}
+
+.works-toolbar {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0.85rem;
+}
+
+/* Sticky top bar: controls above title; full-bleed bg so scroll doesn’t show through */
+.works-toolbar__bar {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    --works-toolbar-toggle-gap: 0.08rem;
+    margin-left: calc(-1 * max(1.25rem, env(safe-area-inset-left, 0px)));
+    margin-right: calc(-1 * max(1.25rem, env(safe-area-inset-right, 0px)));
+    padding: calc(env(safe-area-inset-top, 0px) + 0.4rem) max(1.25rem, env(safe-area-inset-left, 0px)) 0.55rem
+        max(1.25rem, env(safe-area-inset-right, 0px));
+    background-color: hsl(var(--bg-h) var(--bg-s) var(--bg-l));
+    border-bottom: 1px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.06));
+    transition: background-color 0.95s var(--ease-scene), border-color 0.95s var(--ease-scene);
+}
+
+.works-toolbar__home {
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+.works-toolbar__home-mark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0.22rem;
+    margin: 0;
+    border: none;
+    border-radius: 50%;
+    text-decoration: none;
+    color: var(--accent-color, hsl(var(--accent-h) var(--accent-s) var(--accent-l)));
+    cursor: pointer;
+    transition: color 0.95s var(--ease-scene);
+}
+
+.works-toolbar__home-mark:focus {
+    outline: none;
+}
+
+.works-toolbar__home-mark:focus-visible {
+    outline: 2px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.45);
+    outline-offset: 3px;
+}
+
+/* Invisible hit pad above the glyph so moving toward the tooltip doesn’t leave the <a>
+   (default .works-hover-tip uses pointer-events: none, so the gap “tunnelled” pointerleave). */
+.works-toolbar__home-mark::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: calc(100% - 1px);
+    width: min(3.75rem, 100%);
+    height: 2.35rem;
+    transform: none;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* Accent “O” ↔ stroke home: layered SVG + crossfade / scale (no morph library). */
+.works-toolbar__home-glyph {
+    display: block;
+    line-height: 0;
+}
+
+.works-toolbar__home-svg {
+    display: block;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.works-toolbar__home-phase {
+    transform-origin: 12px 12px;
+    transition:
+        opacity 0.42s cubic-bezier(0.45, 0, 0.18, 1),
+        transform 0.52s cubic-bezier(0.45, 0, 0.18, 1);
+}
+
+.works-toolbar__home-phase--dot {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.works-toolbar__home-phase--dot circle {
+    filter: drop-shadow(0 0.08rem 0.28rem hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.28));
+}
+
+.works-toolbar__home-phase--house {
+    opacity: 0;
+    transform: scale(0.78);
+}
+
+@media (hover: hover) {
+    .works-toolbar__home-mark:hover .works-toolbar__home-phase--dot {
+        opacity: 0;
+        transform: scale(0.52);
+    }
+
+    .works-toolbar__home-mark:hover .works-toolbar__home-phase--house {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.works-toolbar__home-mark:focus-visible .works-toolbar__home-phase--dot {
+    opacity: 0;
+    transform: scale(0.52);
+}
+
+.works-toolbar__home-mark:focus-visible .works-toolbar__home-phase--house {
+    opacity: 1;
+    transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .works-toolbar__home-phase {
+        transition-duration: 0.08s;
+    }
+}
+
+.works-toolbar__head {
+    margin-top: 0.85rem;
+    margin-bottom: clamp(0.85rem, 2.2vw, 1.35rem);
+}
+
+.works-toolbar__title {
+    margin: 0;
+    font-size: clamp(1.5rem, 1rem + 1.6vw, 2rem);
+    font-weight: 500;
+    line-height: var(--leading-hero);
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    color: var(--accent-color, hsl(var(--accent-h) var(--accent-s) var(--accent-l)));
+    transition: color 0.95s var(--ease-scene);
+}
+
+.works-toolbar__controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.works-toolbar__tag-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem 1rem;
+    justify-content: space-between;
+}
+
+.works-toolbar__filter-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem 1.35rem;
+    /* Shrink-wrap: tags + clear stay left; sort + view live in `.works-toolbar__view-aside` */
+    flex: 0 1 auto;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.works-toolbar__group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.38rem 0.5rem;
+}
+
+.works-toolbar__group--tags {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.works-toolbar__group--sort {
+    flex: 0 1 auto;
+}
+
+.works-toolbar__tags-with-clear {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.55rem;
+    min-width: 0;
+}
+
+.works-toolbar__view-aside {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 2rem;
+    row-gap: 0.55rem;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.works-toolbar__group--tags .works-tag-row {
+    flex: 0 1 auto;
+    max-width: 100%;
+}
+
+.works-toolbar__group .works-toolbar__inline-label {
+    padding-top: 0.06em;
+}
+
+.works-toolbar__inline-label {
+    flex: 0 0 auto;
+    margin: 0;
+    padding-top: 0.14em;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.5);
+}
+
+.works-toolbar__sort-strip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--works-toolbar-toggle-gap, 0.08rem);
+    flex: 0 0 auto;
+}
+
+.works-toolbar__show-as {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.55rem;
+}
+
+.works-view-strip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--works-toolbar-toggle-gap, 0.08rem);
+}
+
+/* Outline-only toggles (homepage pin / Iconoir stroke — https://iconoir.com) */
+.works-outline-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 2.45rem;
+    min-height: 2.45rem;
+    margin: 0;
+    padding: 0.22rem;
+    border: none;
+    border-radius: 0.35rem;
+    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.88);
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    transition:
+        color 0.2s var(--ease-out-natural),
+        opacity 0.2s var(--ease-out-natural),
+        box-shadow 0.22s var(--ease-out-natural);
+}
+
+.works-outline-toggle:hover {
+    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.98);
+}
+
+.works-outline-toggle:focus {
+    outline: none;
+}
+
+.works-outline-toggle:focus-visible {
+    outline: 2px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.45);
+    outline-offset: 2px;
+}
+
+.works-outline-toggle__svg {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.58;
+    transition: opacity 0.22s var(--ease-out-natural);
+}
+
+.works-outline-toggle[aria-pressed="true"] .works-outline-toggle__svg {
+    opacity: 1;
+}
+
+.works-outline-toggle[aria-pressed="true"] .works-outline-toggle__svg rect {
+    fill: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.16);
+    stroke: currentColor;
+}
+
+/* Sort mono: text-only toggle (no chip outline); active = brighter like TAGS row emphasis */
+.works-outline-toggle--mono {
+    min-width: 0;
+    min-height: 0;
+    padding: 0.08rem 0.2rem;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.works-outline-toggle--mono:focus-visible {
+    border-radius: 0.2rem;
+}
+
+.works-outline-toggle__mono {
+    display: block;
+    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+    font-size: calc(var(--text-meta) * 0.82);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    line-height: 1.15;
+    white-space: nowrap;
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.42);
+    opacity: 1;
+    transition: color 0.2s var(--ease-out-natural);
+}
+
+.works-outline-toggle--mono:hover .works-outline-toggle__mono {
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.62);
+}
+
+.works-outline-toggle--mono[aria-pressed="true"] .works-outline-toggle__mono {
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.94);
+}
+
+.works-outline-toggle--icon .works-outline-toggle__svg {
+    opacity: 0.62;
+}
+
+.works-outline-toggle--icon:hover .works-outline-toggle__svg,
+.works-outline-toggle--icon:focus-visible .works-outline-toggle__svg {
+    opacity: 1;
+}
+
+/* Clear sits after tag chips — slightly tighter hit target to align with chip row */
+.works-outline-toggle--tag-clear {
+    flex-shrink: 0;
+    min-width: 2.05rem;
+    min-height: 2.05rem;
+    padding: 0.1rem;
+}
+
+/* Hover / focus tooltips */
+.works-hover-tip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.35rem);
+    z-index: 4;
+    padding: 0.28rem 0.45rem;
+    max-width: 12rem;
+    border-radius: 0.3rem;
+    font-size: calc(var(--text-meta) * 0.88);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(-50%, 0.2rem, 0);
+    transition:
+        opacity 0.18s var(--ease-out-natural),
+        visibility 0.18s,
+        transform 0.18s var(--ease-out-natural);
+    background: hsl(var(--bg-h) var(--bg-s) calc(var(--bg-l) + 8%) / 0.94);
+    border: 1px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.14);
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.92);
+    box-shadow: 0 0.2rem 0.65rem hsl(0 0% 0% / 0.18);
+}
+
+@media (hover: hover) {
+    .works-outline-toggle:hover .works-hover-tip,
+    .works-toolbar__home-mark:hover .works-hover-tip {
+        opacity: 1;
+        visibility: visible;
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.works-outline-toggle:focus-visible .works-hover-tip,
+.works-toolbar__home-mark:focus-visible .works-hover-tip {
+    opacity: 1;
+    visibility: visible;
+    transform: translate3d(-50%, 0, 0);
+}
+
+@media (hover: hover) {
+    .works-toolbar__home-mark:hover .works-hover-tip.works-home-tip {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.works-toolbar__home-mark:focus-visible .works-hover-tip.works-home-tip {
+    transform: translate3d(0, 0, 0);
+}
+
+/* Home chip: typewriter line + shared caret blink (`sky-cursor-type__caret`).
+   Pin to the left of the control (not centered) so long lines stay in the viewport.
+   Do not use max-width: % here — % is against the tiny <a>, which blocks growth to the right. */
+.works-toolbar__home-mark .works-hover-tip.works-home-tip {
+    left: 0;
+    right: auto;
+    transform: translate3d(0, 0.2rem, 0);
+    width: max-content;
+    max-width: min(12rem, calc(100vw - max(1.25rem, env(safe-area-inset-left, 0px)) - max(1rem, env(safe-area-inset-right, 0px))));
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.works-home-tip {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    pointer-events: auto;
+    z-index: 5;
+}
+
+.works-home-tip__text {
+    flex: 0 0 auto;
+    min-height: 1em;
+}
+
+.works-toolbar__cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem 1.5rem;
+}
+
+.works-view-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1.25rem;
+}
+
+.works-main {
+    position: relative;
+    z-index: 1;
+    min-height: 0;
+}
+
+/* Masonry host: default rail tilt (unused when gallery uses `.works-masonry` — see override below). */
+.works-main.work-rail {
+    margin-left: 0;
+    max-width: 100%;
+    min-height: 0;
+    padding: 0;
+    perspective: 1200px;
+    perspective-origin: 50% 24%;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rail-tilt-x)) rotateY(var(--rail-tilt-y));
+    transition:
+        background-color 0.95s var(--ease-scene),
+        transform 0.22s var(--ease-out-natural);
+    will-change: transform;
+    gap: 0;
+    display: block;
+}
+
+/* Gallery: no 3D rail tilt — adapt-hero pointer tilt warps the grid and reads “broken”. */
+.works-main.work-rail:has(.works-masonry) {
+    perspective: none;
+    transform: none !important;
+    will-change: auto;
+    transform-style: flat;
+}
+
+/* Stable grid gallery: always 2–3 columns (never 1, never 4+). Native masonry rows where supported. */
+.works-masonry {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1.35vw, 0.85rem);
+    align-items: start;
+    isolation: isolate;
+}
+
+@media (min-width: 48rem) {
+    .works-masonry {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@supports (grid-template-rows: masonry) {
+    .works-masonry {
+        grid-template-rows: masonry;
+    }
+}
+
+.works-masonry .work-card {
+    width: 100%;
+    max-width: none;
+    scroll-snap-align: none;
+    scroll-margin-top: 0;
+    scroll-margin-bottom: 0.35rem;
+    transition:
+        transform 0.42s var(--ease-out-back-soft),
+        opacity 0.34s var(--ease-out-natural),
+        box-shadow 0.32s var(--ease-out-natural);
+}
+
+.works-main.work-rail .works-masonry .work-card {
+    position: relative;
+    z-index: 1;
+}
+
+.works-main.work-rail .works-masonry .work-card.work-card--scroll-active {
+    z-index: 2;
+}
+
+/* Taller thumbnails on the All works mosaic grid. */
+.works-masonry .work-card__figure {
+    aspect-ratio: 4 / 3;
+    min-height: clamp(10rem, 26vw, 17.5rem);
+}
+
+/* All-works mosaic: one “spotlight” card (hover / focus / touch peek); peers recede.
+   Scroll-attention JS is intentionally skipped in masonry — this is a discrete gallery analogue. */
+.works-masonry .work-card__overlay .work-card__desc--summary {
+    font-size: calc(var(--text-meta) * 1.12);
+    line-height: 1.38;
+    max-width: 100%;
+}
+
+@media (hover: hover) {
+    .works-masonry:has(> .work-card:hover) > .work-card:not(:hover) {
+        opacity: 0.46;
+        transform: scale(0.965);
+    }
+
+    .works-masonry > .work-card:hover {
+        z-index: 8;
+        transform: scale(1.045) translateY(-0.28rem);
+        box-shadow: var(--work-card-elev-hover);
+    }
+
+    .works-masonry > .work-card:hover .work-card__figure img,
+    .works-masonry > .work-card:hover .work-card__figure video {
+        transform: scale(1.02);
+    }
+
+    .works-masonry > .work-card:hover .work-card__overlay .work-card__desc--summary,
+    .works-masonry > .work-card:hover .work-card__overlay .work-card__desc--year {
+        margin: 0.38rem 0 0;
+        max-height: 4.5rem;
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .works-masonry > .work-card:hover .work-card__overlay .work-card__desc--year {
+        -webkit-line-clamp: 1;
+        max-height: 1.6em;
+    }
+}
+
+.works-masonry:has(> .work-card:focus-visible) > .work-card:not(:focus-visible) {
+    opacity: 0.46;
+    transform: scale(0.965);
+}
+
+.works-masonry > .work-card:focus-visible {
+    z-index: 8 !important;
+    transform: scale(1.045) translateY(-0.28rem) !important;
+    box-shadow: var(--work-card-elev-hover), inset 0 0 0 2px hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.85)) !important;
+}
+
+.works-masonry:has(> .work-card.is-touch-open) > .work-card:not(.is-touch-open) {
+    opacity: 0.46;
+    transform: scale(0.965);
+}
+
+.works-masonry > .work-card.is-touch-open {
+    z-index: 8 !important;
+    transform: scale(1.045) translateY(-0.28rem) !important;
+    box-shadow: var(--work-card-elev-hover) !important;
+}
+
+.works-masonry > .work-card:focus-visible .work-card__overlay .work-card__desc--summary,
+.works-masonry > .work-card.is-touch-open .work-card__overlay .work-card__desc--summary {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    max-height: 16rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .works-masonry .work-card {
+        transition-duration: 0.12s;
+    }
+
+    .works-masonry:has(> .work-card:hover) > .work-card:not(:hover),
+    .works-masonry:has(> .work-card:focus-visible) > .work-card:not(:focus-visible),
+    .works-masonry:has(> .work-card.is-touch-open) > .work-card:not(.is-touch-open) {
+        transform: none;
+        opacity: 0.72;
+    }
+
+    .works-masonry > .work-card:hover,
+    .works-masonry > .work-card:focus-visible,
+    .works-masonry > .work-card.is-touch-open {
+        transform: none !important;
+    }
+
+    .works-masonry > .work-card:hover .work-card__figure img,
+    .works-masonry > .work-card:hover .work-card__figure video {
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @supports (view-transition-name: none) {
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.38s;
+            animation-timing-function: var(--ease-out-natural);
+        }
+    }
+}
+
+.works-list {
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.works-list__item {
+    margin: 0;
+    border-bottom: 1px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.1);
+}
+
+.works-list__link {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 7rem) minmax(0, 1fr) minmax(0, 14rem);
+    gap: 0.35rem 1rem;
+    align-items: baseline;
+    padding: 0.55rem 0;
+    box-sizing: border-box;
+    color: inherit;
+    text-decoration: none;
+    font-size: var(--text-meta);
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s var(--ease-out-natural);
+}
+
+.works-list__link:hover {
+    opacity: 0.92;
+}
+
+.works-list__year {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.72;
+    white-space: nowrap;
+}
+
+.works-list__title {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.works-list__meta {
+    opacity: 0.65;
+    text-align: right;
+}
+
+.works-list__tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.3rem 0.45rem;
+}
+
+.works-list__tags .work-card__tag {
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.82);
+    border-color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.38);
+}
+
+.works-list__draft {
+    font-weight: 400;
+    opacity: 0.72;
+}
+
+@media (max-width: 640px) {
+    .works-list__link {
+        grid-template-columns: minmax(4.5rem, 5.5rem) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+    }
+
+    .works-list__meta {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+}
+
+.works-list__arrow {
+    opacity: 0.45;
+    font-size: 0.95em;
+}
+
+.works-list__item--draft .works-list__title {
+    opacity: 0.78;
+}
+
+.works-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-top: 0.15rem;
+}
+
+.works-controls__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.works-fieldset {
+    margin: 0;
+    padding: 0;
+    border: none;
+    min-width: 0;
+}
+
+.works-fieldset__legend {
+    padding: 0;
+    margin: 0 0 0.45rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+.works-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1 1 12rem;
+    align-items: center;
+    gap: 0.35rem 0.45rem;
+    min-width: 0;
+}
+
+/* Match home overlay `.work-card__tag` geometry; colors read on page background via `--fg-*`. */
+.works-tag-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.88);
+    transition:
+        border-color 0.2s var(--ease-out-natural),
+        background-color 0.2s var(--ease-out-natural),
+        color 0.2s var(--ease-out-natural);
+}
+
+.works-tag-chip__text {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    box-sizing: border-box;
+    font-size: var(--text-meta);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-transform: lowercase;
+    border: 1px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.4);
+    border-radius: 5px;
+    transition: inherit;
+}
+
+.works-tag-chip:hover .works-tag-chip__text {
+    border-color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.55);
+}
+
+.works-tag-chip:has(input:checked) .works-tag-chip__text {
+    border-color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.55);
+    background: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.12);
+    color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.96);
+    box-shadow: inset 0 0 0 1px hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.18);
+}
+
+.works-tag-chip:focus-within .works-tag-chip__text {
+    outline: 2px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.35);
+    outline-offset: 2px;
+}
+
+.works-clear-btn {
+    margin: 0;
+    padding: 0.35rem 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-meta);
+    letter-spacing: 0.03em;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    opacity: 0.88;
+    transition: opacity 0.2s var(--ease-out-natural);
+}
+
+.works-clear-btn:hover {
+    opacity: 1;
+}
+
+.works-sort-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1.25rem;
+}
+
+.works-sort-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: var(--text-meta);
+    letter-spacing: 0.02em;
+    opacity: 0.92;
+}
+
+.works-sort-label input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+}
+
+.works-main .works-error,
+.work-rail .works-error {
+    position: relative;
+    z-index: 1;
+    margin: 0.5rem 0 0;
+    padding: 1rem 1.1rem;
+    max-width: min(100%, 40rem);
+    box-sizing: border-box;
+    line-height: var(--leading-prose);
+    border-radius: 0.65rem;
+    border: 1px solid hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.18);
+    background: hsl(var(--bg-h) var(--bg-s) calc(var(--bg-l) + 4%) / 0.65);
+}
+
+.works-main .works-empty,
+.work-rail .works-empty {
+    position: relative;
+    z-index: 1;
+    margin: 0.35rem 0 0;
+    padding: 1rem 0;
+    max-width: min(100%, 36rem);
+    box-sizing: border-box;
+    line-height: var(--leading-prose);
+    font-size: var(--text-meta);
+    letter-spacing: 0.02em;
+    opacity: 0.88;
+}
+
+@media (pointer: fine) {
+    .works-page {
+        cursor: var(--hero-cursor-rest, auto);
+    }
+
+    .works-page a,
+    .works-page button:not(:disabled) {
+        cursor: var(--hero-cursor-rest, auto);
+    }
+
+    .works-page a:hover,
+    .works-page a:focus-visible,
+    .works-page button:not(:disabled):hover,
+    .works-page button:not(:disabled):focus-visible {
+        cursor: var(--hero-cursor-hover, auto);
+    }
+}
+
+.work-card--draft .work-card__figure img,
+.work-card--draft .work-card__figure video {
+    filter: grayscale(0.62) brightness(0.9);
+    -webkit-filter: grayscale(0.62) brightness(0.9);
+}
+
+.work-card--draft:focus-visible .work-card__figure img,
+.work-card--draft:focus-visible .work-card__figure video,
+.work-card--scroll-active.work-card--draft .work-card__figure img,
+.work-card--scroll-active.work-card--draft .work-card__figure video,
+.work-card--draft.is-touch-open .work-card__figure img,
+.work-card--draft.is-touch-open .work-card__figure video {
+    filter: none;
+    -webkit-filter: none;
+}
+
+.work-card__draft-badge {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 2;
+    margin: 0;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.55rem;
+    border-radius: 4px;
+    background: hsl(0 0% 0% / 0.52);
+    border: 1px solid hsl(220 6% 98% / 0.35);
+    color: hsl(220 6% 98% / 0.94);
+    pointer-events: none;
 }
 
 @media (max-width: 820px) {
@@ -1416,7 +2360,8 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
         transition: none;
     }
 
-    .work-rail {
+    .work-rail,
+    .works-main.work-rail {
         transition: none;
         perspective: none;
         transform: none;

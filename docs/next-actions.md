@@ -1,25 +1,45 @@
-# Next actions
+# Active tasks
 
-Short checklist from [user-stories-and-scope.md](./user-stories-and-scope.md) and current site state. Reorder as you like.
+**This file is the single queue** for what to do next on the site. When you work with Cursor remotely, open or @-mention this doc first so work stays ordered and traceable. Long specs live elsewhere; **done spec lines** are crossed off in those files (for example [feature-all-works.md](./feature-all-works.md)), not duplicated here.
 
-## Ship & verify
+---
 
-1. **GitHub Pages** — **https://apandji.github.io/pandjico/** · Repo **Settings → Pages:** branch **main**, folder **`/` (root)**. After deploys, hard-refresh; see [github-pages.md](./github-pages.md) for HTTPS, paths, and **service worker** (`STATIC_CACHE` bumps).
-2. **HTTPS smoke** — On the live site: footer **Here** pin (permission + line updates); **⁘** or `?lab=1` then random city (place, time, weather should align). Geo needs a **secure context**.
+## Using this with Cursor
 
-## Content (your words)
+- Keep **numbered items** under **Active** in priority order (1 = next unless you say otherwise).
+- When something ships, **move it to “Done (recent)”** with a one-line summary and date, or strike it in the feature doc if it was spec-only.
+- For larger work, add a **link to the feature doc** here instead of pasting the whole spec.
 
-3. **Contact** (`contact.html`) — `mailto`, form, or copy you trust.  
-4. **CV** (`cv.html`) — PDF link, embed, or structured résumé.  
-5. **About** (`about.html`) — Bio; optional portrait; tighten “Adaptive interfaces” or fold into the main story.  
-6. **One case study** — SYNEK or Color Scroller: replace stub body in the matching `projects/*.html` as the template for others.  
-7. **SYNEK URL** — Keep `tactility-grounding.html` or rename (e.g. `projects/synek-launch.html`); update home card + `projects/index.html` + redirect if anything external linked the old slug.
+---
 
-## Product follow-ups
+## Active
 
-8. **Footer extras** — Decide what goes in `.time-footer__extras`. **⁘** = lab (click), scene debug (Shift+click), clear both (Alt+click); `?lab=0` · `?sceneDebug=0` — `js/lab-egg.js`, `js/adapt-hero.js`.
+1. **Live smoke (HTTPS)** — On https://apandji.github.io/pandjico/ : footer **Here** pin; **⁘** or `?lab=1` then random city (place, time, weather). Needs a secure context. See [github-pages.md](./github-pages.md) for deploy + `STATIC_CACHE` bumps.
+2. **Contact** (`contact.html`) — `mailto`, form, or copy you trust.
+3. **CV** (`cv.html`) — PDF link, embed, or structured résumé.
+4. **About** (`about.html`) — Bio; optional portrait; tighten story.
+5. **One full case study** — SYNEK or Color Scroller: replace stub body in the matching `projects/*.html` as the template for the rest.
+6. **SYNEK URL** — Keep `tactility-grounding.html` or rename; update home card + `projects/projects.json` + redirect if anything external used the old slug.
+7. **Footer extras** — Decide what lives in `.time-footer__extras` (beyond **⁘** lab / scene-debug behavior documented in [user-stories-and-scope.md](./user-stories-and-scope.md)).
+8. **All Works v2 — polish** — Lazy video / `IntersectionObserver` for many masonry tiles; list layout QA on real devices; confirm native masonry in browsers that ship [Grid L3](https://www.w3.org/TR/css-grid-3/) (fallback is multicol today). [feature-all-works.md](./feature-all-works.md) §9 / §15.
 
-## Later
+---
 
-9. **11ty + optional CMS** — [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md); single collection for work cards + project pages when you are ready.  
-10. **Doc hygiene** — Check off items here or in [user-stories-and-scope.md](./user-stories-and-scope.md) §6 when done.
+## Done (recent)
+
+| Date | Item |
+|------|------|
+| 2026-05-14 | **All Works MVP** — `projects/index.html` + `projects/projects.json` + `js/works-index.js` + `work-cards.js` rail refresh + `css/styles.css` + `sw.js` precache bump. Spec checklist crossed off in [feature-all-works.md](./feature-all-works.md). |
+| 2026-05-15 | **All Works v2** — Top toolbar, **masonry default** (multicol fallback + `@supports (grid-template-rows: masonry)`), **list** rows, `?view=list`, `data-works-layout` + `work-cards.js` host query; removed split hero / `hero-panel-scroll` on this page. [feature-all-works.md](./feature-all-works.md) §15. |
+
+---
+
+## Later (not the current queue)
+
+- **11ty + optional CMS** — [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md); single collection for cards + project pages when you are ready.
+- **All Works Phase 2** — `audience` meta + `?audience=` presets ([feature-all-works.md](./feature-all-works.md) §2.1); layout v2 is §15 (not the same as `audience`).
+- **GitHub Pages setup** — If not already: repo **Settings → Pages** → branch **main**, folder **`/`**; live URL https://apandji.github.io/pandjico/ — details in [github-pages.md](./github-pages.md).
+
+---
+
+*Reorder **Active** anytime; keep this file honest so remote sessions stay aligned.*

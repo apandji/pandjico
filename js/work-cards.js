@@ -1,6 +1,6 @@
 /**
  * Touch / coarse pointers: first tap opens the overlay; second tap follows href.
- * Hover-capable fine pointers: overlay opens on :focus-visible, scroll-primary card, or touch; cursor is the site circle (CSS + adapt-hero.js on `:root`).
+ * Delegated on `document` so dynamically rendered `.work-card` nodes (e.g. All works) work without rebind.
  */
 (function () {
     var mq = window.matchMedia("(hover: hover)");
@@ -8,35 +8,31 @@
         return;
     }
 
-    document.querySelectorAll(".work-card").forEach(function (card) {
-        card.addEventListener("click", function (e) {
-            if (card.classList.contains("is-touch-open")) {
-                card.classList.remove("is-touch-open");
-                try {
-                    window.dispatchEvent(new CustomEvent("work-card-attention"));
-                } catch (e) {
-                    /* ignore */
-                }
-                return;
-            }
-            e.preventDefault();
-            document.querySelectorAll(".work-card.is-touch-open").forEach(function (c) {
-                c.classList.remove("is-touch-open");
-            });
-            card.classList.add("is-touch-open");
-            try {
-                window.dispatchEvent(new CustomEvent("work-card-attention"));
-            } catch (e) {
-                /* ignore */
-            }
-        });
-    });
-
     document.addEventListener(
         "click",
         function (e) {
-            var t = e.target;
-            if (t && t.closest && !t.closest(".work-card")) {
+            var card = e.target.closest && e.target.closest(".work-card");
+            if (card) {
+                if (card.classList.contains("is-touch-open")) {
+                    card.classList.remove("is-touch-open");
+                    try {
+                        window.dispatchEvent(new CustomEvent("work-card-attention"));
+                    } catch (e0) {
+                        /* ignore */
+                    }
+                    return;
+                }
+                e.preventDefault();
+                document.querySelectorAll(".work-card.is-touch-open").forEach(function (c) {
+                    c.classList.remove("is-touch-open");
+                });
+                card.classList.add("is-touch-open");
+                try {
+                    window.dispatchEvent(new CustomEvent("work-card-attention"));
+                } catch (e1) {
+                    /* ignore */
+                }
+            } else {
                 var hadOpen = document.querySelector(".work-card.is-touch-open");
                 document.querySelectorAll(".work-card.is-touch-open").forEach(function (c) {
                     c.classList.remove("is-touch-open");
@@ -69,9 +65,9 @@
 })();
 
 /**
- * Work rail scroll “attention”: one primary card (viewport-centered), soft scale, gentle blur /
- * desaturation on siblings, exponential smoothing. Only the active card is tabbable / pointer-targetable.
- * `prefers-reduced-motion: reduce` caps blur and keeps opacity closer to 1 (still shows a hint).
+ * Work rail scroll “attention”: primary card near viewport center, soft scale, blur on siblings.
+ * Skips the all-works `.works-masonry` gallery (transforms break layout). Home: `[data-works-layout]` without `.works-masonry`, or legacy `.work-rail`.
+ * Mounts scroll listeners on first non-empty rail; listens for `work-rail-updated` to attach after JS render.
  */
 (function () {
     var reduceMotion = false;
@@ -82,21 +78,29 @@
     }
 
     var root = document.documentElement;
-    var rail = document.querySelector(".work-rail");
-    var cards = rail ? rail.querySelectorAll(".work-card") : null;
-    if (!cards || !cards.length) {
-        return;
-    }
-
-    root.setAttribute("data-work-card-attention", "1");
-
     var smoothByEl = new WeakMap();
-    /* Slightly higher k = fewer frames to settle; coalesced scroll already cuts redundant work. */
     var SMOOTH = reduceMotion ? 0.22 : 0.16;
     var BLUR_CAP = reduceMotion ? 2.25 : 6.5;
     var EPS = 0.008;
     var rafId = null;
     var scrollCoalesceRaf = null;
+    var scrollListenersMounted = false;
+
+    function getCardsArray() {
+        var host = document.querySelector('[data-works-layout="masonry"]');
+        /* All-works gallery: `.works-masonry` + scroll-attention transforms breaks multicol/grid packing. */
+        if (host && host.querySelector(".works-masonry")) {
+            return [];
+        }
+        if (host) {
+            return Array.prototype.slice.call(host.querySelectorAll(".work-card"));
+        }
+        var rail = document.querySelector(".work-rail");
+        if (!rail) {
+            return [];
+        }
+        return Array.prototype.slice.call(rail.querySelectorAll(".work-card"));
+    }
 
     function clamp(x, a, b) {
         return Math.max(a, Math.min(b, x));
@@ -118,7 +122,6 @@
     function attentionCenterY(vh) {
         try {
             if (window.matchMedia("(max-width: 820px)").matches) {
-                /* Stacked layout: hero uses the upper band; bias attention upward so the first work card reads as primary. */
                 return vh * 0.36;
             }
         } catch (eMq) {
@@ -127,7 +130,7 @@
         return vh * 0.5;
     }
 
-    function pickActiveIndex(vh, rects) {
+    function pickActiveIndex(cards, vh, rects) {
         var vc = attentionCenterY(vh);
         var bestI = 0;
         var bestS = -1;
@@ -171,7 +174,7 @@
         return bestI;
     }
 
-    function targetsForIndex(i, activeIdx, vh, focusScale, r) {
+    function targetsForIndex(cards, i, activeIdx, vh, focusScale, r) {
         var el = cards[i];
         var h = (r && r.height) || 1;
         var ov = Math.min(r.bottom, vh) - Math.max(r.top, 0);
@@ -219,6 +222,11 @@
     }
 
     function tick(instant) {
+        var cards = getCardsArray();
+        if (!cards.length) {
+            return false;
+        }
+        ensureScrollListeners();
         var vh = window.innerHeight || 1;
         var focusScale = readFocusScale();
         var i;
@@ -226,7 +234,7 @@
         for (i = 0; i < cards.length; i++) {
             rects[i] = cards[i].getBoundingClientRect();
         }
-        var activeIdx = pickActiveIndex(vh, rects);
+        var activeIdx = pickActiveIndex(cards, vh, rects);
         var k = instant ? 1 : SMOOTH;
         var dirty = false;
         var el;
@@ -239,7 +247,7 @@
             el.classList.toggle("work-card--scroll-active", i === activeIdx);
             el.tabIndex = i === activeIdx ? 0 : -1;
 
-            tgt = targetsForIndex(i, activeIdx, vh, focusScale, rects[i]);
+            tgt = targetsForIndex(cards, i, activeIdx, vh, focusScale, rects[i]);
             sm = smoothByEl.get(el);
             if (!sm || instant) {
                 sm = { sh: tgt.sh, sc: tgt.sc, op: tgt.op, bl: tgt.bl, sat: tgt.sat };
@@ -289,7 +297,6 @@
         });
     }
 
-    /** One layout + tick per frame while the wheel fires; avoids N× getBoundingClientRect per scroll burst. */
     function onScroll() {
         if (scrollCoalesceRaf != null) {
             return;
@@ -310,8 +317,15 @@
         scheduleFollowUp();
     }
 
-    function mount() {
-        tick(true);
+    function ensureScrollListeners() {
+        if (scrollListenersMounted) {
+            return;
+        }
+        if (!getCardsArray().length) {
+            return;
+        }
+        scrollListenersMounted = true;
+        root.setAttribute("data-work-card-attention", "1");
         window.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", onResizeOrAttention);
         window.addEventListener("work-card-attention", onResizeOrAttention);
@@ -322,9 +336,20 @@
         });
     }
 
+    function boot() {
+        ensureScrollListeners();
+        tick(true);
+        scheduleFollowUp();
+    }
+
+    document.addEventListener("work-rail-updated", function () {
+        ensureScrollListeners();
+        onResizeOrAttention();
+    });
+
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", mount);
+        document.addEventListener("DOMContentLoaded", boot, { once: true });
     } else {
-        mount();
+        boot();
     }
 })();

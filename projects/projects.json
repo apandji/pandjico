@@ -1,0 +1,132 @@
+[
+    {
+        "href": "sensory-language.html",
+        "title": "Color Scroller",
+        "year": 2024,
+        "season": "summer",
+        "tags": ["experimental"],
+        "collection": "playground",
+        "draft": false,
+        "desc": "Scroll until stopping feels inevitable—then notice what the interface trained you to do.",
+        "media": {
+            "type": "video",
+            "poster": "../images/projects/color-scroller-thumb.jpg",
+            "sources": [
+                { "src": "../images/projects/color-scroller-loop.mp4", "type": "video/mp4" },
+                { "src": "../images/projects/Pandji_Andrew_ColorScroller_4.MOV", "type": "video/quicktime" }
+            ]
+        }
+    },
+    {
+        "href": "adaptive-interfaces.html",
+        "title": "Ascension Video Chat",
+        "year": 2023,
+        "season": "spring",
+        "tags": ["health"],
+        "collection": "clinical-care",
+        "draft": false,
+        "desc": "Run a day of telehealth without losing the thread between queue, chart, and video.",
+        "media": {
+            "type": "video",
+            "poster": "../images/projects/ascension-videochat-card-poster.jpg",
+            "sources": [{ "src": "../images/projects/ascension-videochat-card.mp4", "type": "video/mp4" }]
+        }
+    },
+    {
+        "href": "tactility-grounding.html",
+        "title": "SYNEK launch campaign",
+        "year": 2022,
+        "season": "fall",
+        "tags": ["brand"],
+        "collection": "identity",
+        "draft": false,
+        "desc": "Brand a beer-dispenser startup from Kickstarter through an international tour—identity, campaign, touchpoints.",
+        "media": {
+            "type": "image",
+            "webp": "../images/projects/synek-story.webp",
+            "jpg": "../images/projects/synek-story-poster.jpg",
+            "width": 1920,
+            "height": 1200
+        }
+    },
+    {
+        "href": "placeholder-case-study.html",
+        "title": "Sensor Lab (WIP)",
+        "year": 2026,
+        "season": "winter",
+        "tags": ["product", "tools"],
+        "collection": "lab",
+        "draft": true,
+        "desc": "Placeholder — hardware sketches, firmware probes, and a lab notebook you can actually read.",
+        "media": {
+            "type": "image",
+            "jpg": "../images/projects/color-scroller-thumb.jpg",
+            "width": 1200,
+            "height": 750
+        }
+    },
+    {
+        "href": "placeholder-case-study.html",
+        "title": "Narrative OS",
+        "year": 2025,
+        "season": "spring",
+        "tags": ["narrative", "experimental"],
+        "collection": "story-systems",
+        "draft": false,
+        "desc": "Placeholder — story beats as system states: what if onboarding were a novella you could branch?",
+        "media": {
+            "type": "image",
+            "jpg": "../images/projects/ascension-videochat-card-poster.jpg",
+            "width": 1600,
+            "height": 1000
+        }
+    },
+    {
+        "href": "placeholder-case-study.html",
+        "title": "Dispatch console",
+        "year": 2024,
+        "season": "winter",
+        "tags": ["product", "health"],
+        "collection": "clinical-care",
+        "draft": false,
+        "desc": "Placeholder — a dense operations surface with humane defaults for triage and handoff.",
+        "media": {
+            "type": "image",
+            "jpg": "../images/projects/synek-story-poster.jpg",
+            "width": 1920,
+            "height": 1200
+        }
+    },
+    {
+        "href": "placeholder-case-study.html",
+        "title": "Material study: glass",
+        "year": 2023,
+        "season": "fall",
+        "tags": ["brand"],
+        "collection": "identity",
+        "draft": true,
+        "desc": "Placeholder — refractive UI mockups and print tests (draft).",
+        "media": {
+            "type": "image",
+            "jpg": "../images/projects/color-scroller-thumb.jpg",
+            "width": 1200,
+            "height": 750
+        }
+    },
+    {
+        "href": "placeholder-case-study.html",
+        "title": "Tooling kit",
+        "year": 2021,
+        "season": "summer",
+        "tags": ["tools"],
+        "collection": "platform-tooling",
+        "draft": false,
+        "desc": "Placeholder — scripts, tokens, and small CLIs that keep design and engineering in sync.",
+        "media": {
+            "type": "image",
+            "jpg": "../images/projects/ascension-videochat-card-poster.jpg",
+            "width": 1600,
+            "height": 1000
+        }
+    }
+]

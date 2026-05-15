@@ -1,6 +1,6 @@
 # User stories & site scope
 
-**Purpose:** What the portfolio is driving toward—adaptive scene, footer, lab tooling, accessibility—and how it maps to pages. **Audience:** you or anyone reopening the repo after a break.
+**Purpose:** What the portfolio is driving toward—adaptive scene, footer, lab tooling, accessibility—and how it maps to pages. **Audience:** you or anyone reopening the repo after a break. **Active task queue (single list):** [next-actions.md](./next-actions.md).
 
 ---
 
@@ -56,12 +56,17 @@
 | `index.html` | Home: hero, work rail, adaptive footer |
 | `about.html` · `contact.html` · `cv.html` | Shells — replace placeholders |
 | `projects/*.html` | Case studies; **`tactility-grounding.html`** = SYNEK card until you rename + redirect |
+| `projects/index.html` | **All Works v2** — top toolbar, masonry + list, `?view=list` — [feature-all-works.md](./feature-all-works.md) §15 · [next-actions.md](./next-actions.md) |
 
 **Primary code:** `js/adapt-hero.js` (palette, anchors, Open-Meteo, lab geo/TZ/place, prose WCAG, footer timers), `css/styles.css`, `js/work-cards.js` (rail; `attentionCenterY` under **820px**), `js/lab-egg.js`, `js/register-sw.js` + **`sw.js`** (bump **`STATIC_CACHE`** when precached assets change), `js/frost-tooltip.js`.
 
 ---
 
 ## 4. When you resume (suggested order)
+
+**Single queue:** open **[next-actions.md](./next-actions.md)** first — ordered **Active** tasks for you and for Cursor-style remote sessions.
+
+High-level themes (details and numbering live in that file):
 
 1. Ship **one** full case study (SYNEK or Color Scroller) as the template for the rest.  
 2. Minimum **Contact / CV / About** content.  
@@ -81,8 +86,9 @@ Server-side geolocation; runtime CMS on the public site. **Custom domain:** repo
 | Area | State |
 |------|--------|
 | Footer, pin, lab egg, geo + caption flow, work-rail small viewports, SYNEK stub alignment, temp-driven palette, scene-debug °F sim, hero prose WCAG vs `--bg-*` | In repo |
+| **All Works** (`projects/index.html`, JSON, filters, sort, URL, views, SW precache) | **v2 shipped** (toolbar + masonry default + list); polish: lazy tiles, device QA — [next-actions.md](./next-actions.md) |
 | Case study prose, contact/CV/about copy, SYNEK slug decision, footer extras content, 11ty/CMS | Needs you |
 
 ---
 
-*Update this file when priorities shift.*
+*Update [next-actions.md](./next-actions.md) when priorities shift; keep this file’s themes in sync.*
