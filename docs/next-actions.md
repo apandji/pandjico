@@ -1,31 +1,25 @@
-# Your next actions
+# Next actions
 
-Short checklist derived from [user-stories-and-scope.md](./user-stories-and-scope.md) and current site state. Reorder however you like.
+Short checklist from [user-stories-and-scope.md](./user-stories-and-scope.md) and current site state. Reorder as you like.
 
-## Tonight / first session back
+## Ship & verify
 
-1. **GitHub Pages** — Site: **https://apandji.github.io/pandjico/** · Repo: **https://github.com/apandji/pandjico** · Settings → Pages should show **main** + **/ (root)**. *(Deploy path verified in-repo; re-check after any Pages or repo rename.)*
-2. **Custom domain (optional)** — If you use a domain later: repo **Settings → Pages → Custom domain**, then DNS CNAME to `apandji.github.io` (and remove `/pandjico` path or use apex rules as GitHub documents).
+1. **GitHub Pages** — **https://apandji.github.io/pandjico/** · Repo **Settings → Pages:** branch **main**, folder **`/` (root)**. After deploys, hard-refresh; see [github-pages.md](./github-pages.md) for HTTPS, paths, and **service worker** (`STATIC_CACHE` bumps).
+2. **HTTPS smoke** — On the live site: footer **Here** pin (permission + line updates); **⁘** or `?lab=1` then random city (place, time, weather should align). Geo needs a **secure context**.
 
-## Content (needs your words)
+## Content (your words)
 
-3. **Contact** (`contact.html`) — Replace placeholder with email, `mailto:`, or a form provider you trust.
-4. **CV** (`cv.html`) — Add PDF link, embed, or structured résumé blocks.
-5. **About** (`about.html`) — Bio, portrait optional; flesh out the “Adaptive interfaces” section or merge into main narrative.
-6. **One full case study** — Pick **SYNEK** or **Color Scroller**; replace stub body in the matching `projects/*.html` file as the template for the others.
-7. **SYNEK URL (decision)** — Keep `tactility-grounding.html` or rename to e.g. `projects/synek-launch.html` / `projects/synek/` and update the home card + `projects/index.html` + add a redirect from the old URL if anything linked externally.
+3. **Contact** (`contact.html`) — `mailto`, form, or copy you trust.  
+4. **CV** (`cv.html`) — PDF link, embed, or structured résumé.  
+5. **About** (`about.html`) — Bio; optional portrait; tighten “Adaptive interfaces” or fold into the main story.  
+6. **One case study** — SYNEK or Color Scroller: replace stub body in the matching `projects/*.html` as the template for others.  
+7. **SYNEK URL** — Keep `tactility-grounding.html` or rename (e.g. `projects/synek-launch.html`); update home card + `projects/index.html` + redirect if anything external linked the old slug.
 
-## Product / layout
+## Product follow-ups
 
-8. **Footer extras** — **⁘** toggles **lab** (click) and **scene time** debug (Shift+click); **Alt+click** clears both. URLs: `?lab=0`, `?sceneDebug=0` (`js/lab-egg.js`, `adapt-hero.js`).
-9. ~~**Work rail — small viewports**~~ — **Done:** under **820px** width the scroll “attention” line sits at **36%** of viewport height so the **first** work card reads as primary (`attentionCenterY` in `js/work-cards.js`).
-10. **Smoke-test geo** — On the **HTTPS** live site, use **⁘** or `?lab=1`, then the footer **here** pin and geo fields; confirm permission + weather. Geolocation requires a **secure context** (GitHub Pages is HTTPS).
+8. **Footer extras** — Decide what goes in `.time-footer__extras`. **⁘** = lab (click), scene debug (Shift+click), clear both (Alt+click); `?lab=0` · `?sceneDebug=0` — `js/lab-egg.js`, `js/adapt-hero.js`.
 
-## Authoring (when you are ready)
+## Later
 
-11. **11ty + CMS** — Follow [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md): init Eleventy, then add Tina / Decap / Sanity if you want a visual editor.
-12. **Single source for work cards** — Once 11ty exists, drive home rail + project pages from one collection so titles never drift again.
-
-## Maintenance
-
-13. **Update this list** — Check off items here or in `user-stories-and-scope.md` §7 when done.
+9. **11ty + optional CMS** — [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md); single collection for work cards + project pages when you are ready.  
+10. **Doc hygiene** — Check off items here or in [user-stories-and-scope.md](./user-stories-and-scope.md) §6 when done.

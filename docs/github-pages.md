@@ -1,51 +1,40 @@
 # GitHub Pages for this repo
 
-The site is **static** (HTML/CSS/JS at the repository root). No build step is required for the current setup.
+Static **HTML/CSS/JS** at the repo root; no build step for the current setup.
 
 **Published URL:** https://apandji.github.io/pandjico/
 
-## After the first push
+## Configure Pages
 
-Pages is configured to deploy from **`main`** at **`/` (root)**. If you ever need to reconfigure:
+1. Repo → **Settings** → **Pages**.  
+2. **Source:** Deploy from a branch.  
+3. **Branch:** `main` · **Folder:** `/ (root)`  
+4. Save; wait 1–3 minutes; hard-refresh. **Actions** may show a “pages build and deployment” run.
 
-1. On GitHub open the repo → **Settings** → **Pages** (sidebar).
-2. Under **Build and deployment**:
-   - **Source:** Deploy from a branch  
-   - **Branch:** `main` (or `master` if you used that)  
-   - **Folder:** `/ (root)`
-3. Save. The site will be published at:
+**Project URL shape:** `https://<user>.github.io/<repo>/` — if you **rename the repo**, the public URL changes unless you add a **custom domain**.
 
-   **`https://apandji.github.io/pandjico/`**
-
-   (Project Pages URL = `https://<user>.github.io/<repo>/`)
-
-4. Wait one to three minutes, then hard-refresh. **Actions** tab may show a “pages build and deployment” run.
-
-## Notes
-
-- **HTTPS** — Provided by GitHub; geolocation and `navigator.clipboard` behave better than on raw `file://`.
-- **Paths** — This repo uses **relative** asset paths (`css/styles.css`, `../css/styles.css` in `projects/`, `js/*.js` from the root pages), which is correct for a project site under `/pandjico/`.
-- **Scene script** — On the home page, `js/adapt-hero.js` is loaded in `<head>` **without** `defer` (after the stylesheet) so hourly palette / accent CSS variables apply before the first paint; it also keeps the `<meta name="theme-color">` (id `dynamic-theme-color`) aligned with the scene background like the favicon. Other scripts stay `defer`.
-- **Lab / debug** — Footer **⁘** toggles `localStorage.lab` (click) and `sceneDebug` (Shift+click); **Alt+click** clears both. URLs `?lab=1|0`, `?sceneDebug=1|0`. See `js/lab-egg.js` + `adapt-hero.js`.
-- **If you rename the repo** — The public URL changes to match the new repo name unless you add a custom domain.
-
-## Local preview (same as before)
+## Local preview
 
 ```bash
 cd /path/to/pandjico
 python3 -m http.server 3333 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:3333/` — optional `?lab=1` for lab UI. Service worker registration works on `http://localhost` / `127.0.0.1` (use HTTPS on GitHub Pages).
+Open `http://127.0.0.1:3333/` — optional `?lab=1` / `?sceneDebug=1` for debug UI. SW registration works on `localhost` / `127.0.0.1`; use **HTTPS** on GitHub Pages for geo + clipboard.
 
-## Service worker (repeat visits, offline shell)
+## Notes
 
-The site ships **`sw.js`** at the repo root plus **`js/register-sw.js`** (included from every HTML page). GitHub Pages does not let you set custom `Cache-Control` headers; the worker instead:
+- **HTTPS** — Geolocation and `navigator.clipboard` behave better than on `file://`.  
+- **Paths** — Relative assets (`css/`, `js/`; `../css/` from `projects/`) suit hosting under `/pandjico/`.  
+- **`adapt-hero.js`** — Loaded on the home page so `--bg-*` / `--fg-*` / accents apply before first paint; updates favicon + `theme-color`. Lab, scene debug, weather, and prose contrast live here — see [user-stories-and-scope.md](./user-stories-and-scope.md).  
+- **Lab / debug** — Footer **⁘**: lab (click), scene debug (Shift+click), clear (Alt+click). URLs: `?lab=1|0`, `?sceneDebug=1|0`. `js/lab-egg.js` + `js/adapt-hero.js`.
 
-- **Precaches** core HTML, CSS, JS, fonts, and project stubs (see `PRECACHE_REL` in `sw.js`).
-- Uses **network-first** for navigations so you normally see fresh HTML after deploys.
-- Uses **cache-first** for other same-origin GETs (then fills a runtime cache), but **never** intercepts large **video** (`.mp4`, `.mov`, …) so those always hit the network.
+## Service worker
 
-**After you change precached files** (CSS, JS, fonts, or any precached HTML path), bump **`STATIC_CACHE`** (and optionally **`RUNTIME_CACHE`**) in `sw.js` so old caches are deleted on activate.
+`sw.js` + `js/register-sw.js` on every HTML page. GitHub Pages cannot set custom `Cache-Control`; the worker:
 
-If you add new global assets, append their **scope-relative paths** to `PRECACHE_REL` and bump the cache name.
+- **Precaches** core HTML, CSS, JS, fonts, stubs (`PRECACHE_REL` in `sw.js`).  
+- **Network-first** navigations so deploys usually show fresh HTML.  
+- **Cache-first** other same-origin GETs (runtime cache); **does not** intercept large **video** (`.mp4`, `.mov`, …).
+
+**When you change precached files:** bump **`STATIC_CACHE`** (and optionally **`RUNTIME_CACHE`**) in `sw.js`. Add new global assets to `PRECACHE_REL` and bump the cache name.

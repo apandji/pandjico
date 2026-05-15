@@ -133,4 +133,4 @@ Then add `eleventy.config.cjs` with `dir.input`, `dir.output`, and `addPassthrou
 2. Add **Tina** or **Decap** when you miss a **browser** editor.  
 3. Consider **Sanity** if you outgrow Markdown and want **reusable modules** and a real asset library.
 
-This keeps the **public site static** while making **writing** the long pole faster—and aligns with the scope doc’s “trustworthy project URLs” and SYNEK slug cleanup.
+This keeps the **public site static** while making **writing** the long pole faster—see [user-stories-and-scope.md](./user-stories-and-scope.md) for content goals and SYNEK slug notes.
