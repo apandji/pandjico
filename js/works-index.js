@@ -33,9 +33,9 @@
     ];
     const HOME_TIP_CHAR_MS = 38;
 
-    const homeLink = document.querySelector(".works-toolbar__home-mark");
-    const homeTipTextEl = document.querySelector(".works-home-tip__text");
-    const homeTipCaretEl = document.querySelector(".works-home-tip__caret");
+    const homeLink = document.querySelector(".works-page .works-toolbar__home-mark");
+    const homeTipTextEl = document.querySelector(".works-page .works-home-tip__text");
+    const homeTipCaretEl = document.querySelector(".works-page .works-home-tip__caret");
 
     if (!main || !tagContainer) return;
 

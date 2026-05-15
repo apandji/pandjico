@@ -33,7 +33,7 @@
                     I'm&nbsp;<a class="hero-name-link" href="about.html"><em>Andrew&nbsp;Pandji</em></a>&nbsp;—&nbsp;a creative technologist, artist &amp; experience&nbsp;design&nbsp;leader.
                 </h1>
                 <p class="hero__lede hero__lede--desktop">
-                    <strong>I tend this station, where that practice lives.</strong> Currently I’m researching interfaces that bring legibility to invisible&nbsp;systems. I center tactility, grounding and care in my work.<br><br>
+                    <strong>I tend this <a class="hero-inline-link" href="station.html">station</a> where that practice lives.</strong> Currently I’m researching interfaces that bring legibility to invisible&nbsp;systems. I center tactility, grounding and care in my work.<br><br>
                     Before this I spent eight&nbsp;years building products that accelerated care and healing across the entire scale of impact. From pre&#8209;seed to one of the largest health&nbsp;systems in America.
                 </p>
             </section>
@@ -319,7 +319,7 @@
         <a href="https://www.are.na/pandji" target="_blank" rel="noopener noreferrer">are.na</a>
         <span aria-hidden="true">·</span>
         <a href="https://github.com/apandji" target="_blank" rel="noopener noreferrer">github</a>
-        <span class="mobile-overscroll-tray__mark" aria-hidden="true">⁘</span>
+        <a class="mobile-overscroll-tray__mark" href="station.html" aria-label="go to station">⁘</a>
     </nav>
 
     <footer class="time-footer" role="contentinfo">
@@ -334,7 +334,7 @@
                                     id="footer-toy-tip"
                                     role="tooltip"
                                 >
-                                    <span class="frost-tooltip__text">Use my own sky instead</span
+                                    <span class="frost-tooltip__text">use my own sky instead</span
                                     ><span
                                         class="frost-tooltip__caret sky-cursor-type__caret"
                                         aria-hidden="true"
@@ -373,15 +373,15 @@
                         aria-label="Additional footer links or notes"
                         role="region"
                     >
-                        <button
-                            type="button"
-                            class="time-footer__extras-dial"
+                        <a
+                            href="station.html"
+                            class="time-footer__extras-dial time-footer__extras-dial--station"
                             id="footer-extras-dial"
-                            aria-label="Open scene tools"
-                            title="Click: toggle sky &amp; geo lab · Shift+click: toggle scene time slider · Alt+click: turn off lab &amp; scene debug · Or use ?lab=0 / ?sceneDebug=0"
+                            aria-label="go to station"
                         >
                             ⁘
-                        </button>
+                            <span class="works-hover-tip" role="tooltip">go to station</span>
+                        </a>
                     </div>
                 </div>
                 <p class="time-footer__lab" id="footer-lab" hidden aria-hidden="true"></p>
@@ -429,7 +429,7 @@
             </div>
         </div>
     </footer>
-    <script src="js/lab-egg.js" defer></script>
+    <script src="js/station-dial.js" defer></script>
     <script src="js/register-sw.js" defer></script>
 </body>
 </html>

@@ -90,7 +90,9 @@
     var FOOTER_CAPTION_INTRO_KEY = "pandjiFooterCaptionIntroDismissed";
     var FOOTER_INTRO_LINE =
         "This site take readings, with colors shifting to match the rhythm of the day.";
-    var FOOTER_SKY_TOOLTIP_DEFAULT = "Use my own sky instead";
+    var FOOTER_SKY_TOOLTIP_DEFAULT = "use my own sky instead";
+    var FOOTER_SKY_TOOLTIP_DENIED = "no worries — st. louis skies are good skies.";
+    var footerSkyDenyResetId = 0;
     var FOOTER_CAPTION_TYPE_CHAR_MS = 34;
     var FOOTER_CAPTION_INTRO_HOLD_MS = 5200;
     var FOOTER_CAPTION_GLITCH_MS = 1120;
@@ -1170,6 +1172,133 @@
     var ACCENT_HUE_OFFSET = 180;
     var ACCENT_HUE_OFFSET_ANALOG_DARK = 28;
 
+    function hslToHex(h, s, l) {
+        var rgb = hslToRgb(h, s, l);
+        function byte(n) {
+            var x = Math.round(Math.max(0, Math.min(255, n)));
+            var hex = x.toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+        }
+        return ("#" + byte(rgb.r) + byte(rgb.g) + byte(rgb.b)).toLowerCase();
+    }
+
+    function scenePaletteAtHour(clockH) {
+        var sunCtx = sunContextForScene(clockH);
+        var darkScheme = sunCtx.darkSchemeAuto;
+        var sampled = sampleScene(clockH);
+        sampled = applyGoldenTint(sampled, sunCtx.golden, sunCtx.goldenMorning);
+        sampled = applyTempSeasonTint(sampled, effectivePaletteTempF());
+        var bgH = Math.round(sampled.h);
+        var bgSNum = sampled.s;
+        var bgL = sampled.l;
+        if (darkScheme) {
+            bgL = Math.min(bgL, 86);
+        }
+        var bgLNum = Math.round(bgL);
+        var bgSRound = Math.round(bgSNum);
+        var wantLightAccent = darkScheme;
+        var nh = ((bgH % 360) + 360) % 360;
+        var compHue = wrapHue(nh + ACCENT_HUE_OFFSET);
+        var analHue = wrapHue(nh + ACCENT_HUE_OFFSET_ANALOG_DARK);
+        var compPick = pickAccentSL(compHue, bgH, bgSRound, bgLNum, wantLightAccent, 3.2);
+        var analPick = pickAccentSL(analHue, bgH, bgSRound, bgLNum, wantLightAccent, 3.2);
+        return {
+            sky: { h: bgH, s: bgSRound, l: bgLNum },
+            complement: { h: Math.round(compHue), s: compPick.s, l: compPick.l },
+            analogous: { h: Math.round(analHue), s: analPick.s, l: analPick.l },
+        };
+    }
+
+    function formatSceneTimeLabel(clockH) {
+        var h = clockH % 24;
+        if (h < 0) {
+            h += 24;
+        }
+        var hi = Math.floor(h);
+        var mi = Math.round((h - hi) * 60);
+        if (mi === 60) {
+            hi = (hi + 1) % 24;
+            mi = 0;
+        }
+        return (hi < 10 ? "0" : "") + hi + ":" + (mi < 10 ? "0" : "") + mi;
+    }
+
+    function formatRelativeSceneHours(clockH) {
+        var now = sceneClockHourFloat() % 24;
+        var delta = (clockH % 24) - now;
+        if (delta > 12) {
+            delta -= 24;
+        }
+        if (delta < -12) {
+            delta += 24;
+        }
+        if (Math.abs(delta) < 0.08) {
+            return "";
+        }
+        var hours = Math.round(delta);
+        if (hours === 0) {
+            var mins = Math.round(delta * 60);
+            if (mins === 0) {
+                return "";
+            }
+            return mins > 0 ? "(in about +" + mins + " min)" : "(about " + mins + " min ago)";
+        }
+        return hours > 0 ? "(in about +" + hours + " hours)" : "(about " + -hours + " hours ago)";
+    }
+
+    function paletteColorMeta(c) {
+        return {
+            hex: hslToHex(c.h, c.s, c.l),
+            hsl: c.h + " " + c.s + "% " + c.l + "%",
+        };
+    }
+
+    function buildDayBarTipRow(label, c) {
+        var meta = paletteColorMeta(c);
+        var row = document.createElement("div");
+        row.className = "station-day-bar__tip-row";
+        row.innerHTML =
+            '<span class="station-day-bar__tip-label">' +
+            label +
+            '</span><span class="station-day-bar__tip-colon">:</span>' +
+            '<span class="station-day-bar__tip-swatch" style="background:' +
+            meta.hex +
+            '"></span>' +
+            '<span class="station-day-bar__tip-hex">' +
+            meta.hex +
+            '</span>' +
+            '<span class="station-day-bar__tip-hsl">' +
+            meta.hsl +
+            "</span>";
+        return row;
+    }
+
+    function buildDayBarTip(tipEl, clockH, showRelative) {
+        if (!tipEl) {
+            return;
+        }
+        var palette = scenePaletteAtHour(clockH);
+        var rel = showRelative ? formatRelativeSceneHours(clockH) : "";
+        tipEl.replaceChildren();
+        var timeRow = document.createElement("p");
+        timeRow.className = "station-day-bar__tip-time";
+        timeRow.textContent = formatSceneTimeLabel(clockH);
+        if (rel) {
+            var relSpan = document.createElement("span");
+            relSpan.className = "station-day-bar__tip-offset";
+            relSpan.textContent = " " + rel;
+            timeRow.appendChild(relSpan);
+        }
+        tipEl.appendChild(timeRow);
+        tipEl.appendChild(buildDayBarTipRow("sky", palette.sky));
+        tipEl.appendChild(buildDayBarTipRow("ink analog", palette.analogous));
+        tipEl.appendChild(buildDayBarTipRow("ink complement", palette.complement));
+    }
+
+    function formatDayBarHint() {
+        return "currently it is " + formatSceneTimeLabel(sceneClockHourFloat());
+    }
+
     function hslToRgb(h, s, l) {
         h = ((h % 360) + 360) % 360;
         s = Math.max(0, Math.min(100, s)) / 100;
@@ -1738,10 +1867,7 @@
         return { textEl: textEl, caretEl: caretEl };
     }
 
-    function buildFooterCaptionText(clockH) {
-        void clockH;
-        var now = new Date();
-        var tz = effectiveSceneTimeZone();
+    function zonedDateTimeParts(now, tz) {
         var wd = new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short" })
             .format(now)
             .toLowerCase();
@@ -1803,8 +1929,6 @@
                 mm = hm[2];
             }
         }
-        var hFloat = zonedClockHourFloat(now, tz);
-        var greet = greetingFromHour(hFloat);
         var hi = parseInt(hh || "0", 10);
         var mi = parseInt(mm || "0", 10);
         if (isNaN(hi)) {
@@ -1815,22 +1939,84 @@
         }
         hh = hi < 10 ? "0" + hi : String(hi);
         mm = mi < 10 ? "0" + mi : String(mi);
+        return { wd: wd, day: day, month: month, year: year, hh: hh, mm: mm };
+    }
 
+    function buildStationReadingsText(clockH) {
+        void clockH;
+        var now = new Date();
+        var tz = effectiveSceneTimeZone();
+        var p = zonedDateTimeParts(now, tz);
+        var parts = [p.wd + " " + p.day + " " + p.month, p.hh + ":" + p.mm];
+        var capTemp = captionDisplayTempF();
+        if (capTemp != null && !isNaN(capTemp)) {
+            parts.push(Math.round(capTemp) + "\u00b0");
+        }
+        parts.push(readDisplayPlaceLower());
+        return parts.join(" \u00b7 ");
+    }
+
+    function updateStationReadings(clockH) {
+        var el = document.getElementById("station-readings");
+        if (!el) {
+            return;
+        }
+        var text = buildStationReadingsText(clockH);
+        var span = el.querySelector("[data-station-readings-text]");
+        if (span) {
+            span.textContent = text;
+        } else {
+            el.textContent = text;
+        }
+    }
+
+    function updateStationDayBar() {
+        var bar = document.getElementById("station-day-bar");
+        var marker = document.getElementById("station-day-bar-marker");
+        var hint = document.getElementById("station-day-hint");
+        var tip = document.getElementById("station-day-tip");
+        if (!bar || bar.dataset.active === "true") {
+            return;
+        }
+        var h = sceneClockHourFloat() % 24;
+        if (h < 0) {
+            h += 24;
+        }
+        var pct = (h / 24) * 100;
+        bar.style.setProperty("--station-day-pct", String(pct));
+        if (marker) {
+            marker.style.left = pct + "%";
+        }
+        if (tip) {
+            tip.style.left = pct + "%";
+        }
+        if (hint) {
+            hint.textContent = formatDayBarHint();
+        }
+    }
+
+    function buildFooterCaptionText(clockH) {
+        void clockH;
+        var now = new Date();
+        var tz = effectiveSceneTimeZone();
+        var p = zonedDateTimeParts(now, tz);
+        var hFloat = zonedClockHourFloat(now, tz);
+        var greet = greetingFromHour(hFloat);
         var place = readDisplayPlaceLower();
         var core =
             greet +
             ", it's " +
-            wd +
+            p.wd +
             " " +
-            day +
+            p.day +
             " " +
-            month +
+            p.month +
             " " +
-            year +
+            p.year +
             ", " +
-            hh +
+            p.hh +
             ":" +
-            mm;
+            p.mm;
         var capTemp = captionDisplayTempF();
         if (capTemp != null && !isNaN(capTemp)) {
             core += " and " + Math.round(capTemp) + "\u00b0 in " + place;
@@ -1992,15 +2178,16 @@
         runFooterCaptionIntroSequence();
     }
 
-    function syncFooterSkyTooltip(trackingOverride) {
-        var tipRoot = document.getElementById("footer-toy-tip");
-        var textEl = tipRoot && tipRoot.querySelector(".frost-tooltip__text");
-        if (!textEl) {
+    function syncFooterSkyTooltip(trackingOverride, customMessage) {
+        var tips = document.querySelectorAll(".frost-tooltip.sky-ui-chip .frost-tooltip__text");
+        if (!tips.length) {
             return;
         }
         var hereOn = readFooterAnchorMode() === "here" && !!readStoredGeoCoords();
         var full;
-        if (hereOn || trackingOverride) {
+        if (customMessage) {
+            full = customMessage;
+        } else if (hereOn || trackingOverride) {
             var slug =
                 trackingOverride != null && String(trackingOverride).trim()
                     ? String(trackingOverride).trim()
@@ -2009,11 +2196,27 @@
         } else {
             full = FOOTER_SKY_TOOLTIP_DEFAULT;
         }
-        tipRoot.dataset.tipText = full;
-        textEl.textContent = full;
+        document.querySelectorAll(".frost-tooltip.sky-ui-chip").forEach(function (tipRoot) {
+            tipRoot.dataset.tipText = full;
+            var textEl = tipRoot.querySelector(".frost-tooltip__text");
+            if (textEl) {
+                textEl.textContent = full;
+            }
+        });
+    }
+
+    function showFooterSkyDenyFeedback() {
+        window.clearTimeout(footerSkyDenyResetId);
+        syncFooterSkyTooltip(null, FOOTER_SKY_TOOLTIP_DENIED);
+        footerSkyDenyResetId = window.setTimeout(function () {
+            footerSkyDenyResetId = 0;
+            syncFooterSkyTooltip();
+        }, 5200);
     }
 
     function updateFooterCaption(clockH) {
+        updateStationReadings(clockH);
+        updateStationDayBar();
         var cap = document.getElementById("footer-caption");
         var labEl = document.getElementById("footer-lab");
         if (!cap) {
@@ -2144,7 +2347,6 @@
                 },
                 function (err) {
                     btn.disabled = false;
-                    syncFooterSkyTooltip();
                     var why = "unknown";
                     if (err && typeof err.code === "number") {
                         if (err.code === 1) {
@@ -2156,6 +2358,11 @@
                         } else {
                             why = "code " + err.code;
                         }
+                    }
+                    if (err && err.code === 1) {
+                        showFooterSkyDenyFeedback();
+                    } else {
+                        syncFooterSkyTooltip();
                     }
                     if (typeof console !== "undefined" && console.warn) {
                         console.warn("[footer geo] " + why);
@@ -2176,6 +2383,7 @@
         }
         maybeRefreshPlaceName();
         updateFooterCaption(hour);
+        updateStationDayBar();
         syncFooterSkyToggle();
         maybeRefreshWeather();
     }
@@ -2221,4 +2429,21 @@
         bindDomDependentChrome();
         startPeriodicTimers();
     }
+
+    window.pandjiSky = {
+        updateStationReadings: function () {
+            updateStationReadings(clockHourFloat());
+        },
+        updateStationDayBar: function () {
+            updateStationDayBar();
+        },
+        getStationReadingsText: function () {
+            return buildStationReadingsText(clockHourFloat());
+        },
+        getSceneClockHour: function () {
+            return sceneClockHourFloat();
+        },
+        buildDayBarTip: buildDayBarTip,
+        formatDayBarHint: formatDayBarHint,
+    };
 })();

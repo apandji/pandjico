@@ -54,16 +54,24 @@
         return { minLeft: minLeft, maxLeft: maxLeft, innerRight: innerRight };
     }
 
+    function usesWrapLocalCoords(wrap) {
+        return (
+            wrap.classList.contains("time-footer__sky-wrap") &&
+            (wrap.classList.contains("station-toolbar__sky-wrap") || wrap.closest(".time-footer"))
+        );
+    }
+
     function writeTipBox(tip, wrap, viewportLeft, viewportTop, widthPx) {
         var l = viewportLeft;
         var t = viewportTop;
-        if (wrap.classList.contains("time-footer__sky-wrap")) {
+        if (usesWrapLocalCoords(wrap)) {
             var wr = wrap.getBoundingClientRect();
             l -= wr.left;
             t -= wr.top;
         }
         tip.style.left = Math.round(l) + "px";
         tip.style.top = Math.round(t) + "px";
+        tip.style.bottom = "auto";
         tip.style.width = Math.ceil(widthPx) + "px";
     }
 

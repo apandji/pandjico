@@ -2,7 +2,7 @@
 
 **This file is the single queue** for what to do next on the site. When you work with Cursor remotely, open or @-mention this doc first so work stays ordered and traceable.
 
-**Doc map:** [README.md](./README.md) · [STATION.md](../STATION.md) · **North star:** [station-concept-and-critique.md](./station-concept-and-critique.md) · **Mobile:** [mobile-spec.md](./mobile-spec.md) · **Longwave:** [project-longwave.md](./project-longwave.md)
+**Doc map:** [README.md](./README.md) · [STATION.md](../STATION.md) · **North star:** [station-concept-and-critique.md](./station-concept-and-critique.md) · **Station page PRD:** [station-page.md](./station-page.md) · **Mobile:** [mobile-spec.md](./mobile-spec.md) · **Longwave:** [project-longwave.md](./project-longwave.md)
 
 Long specs live elsewhere; **done spec lines** are crossed off in those files (for example [instrument-collections.md](./instrument-collections.md)), not duplicated here.
 
@@ -31,7 +31,7 @@ Long specs live elsewhere; **done spec lines** are crossed off in those files (f
 3. **CV** (`cv.html`) — Practice record voice, not résumé theater; PDF or structured page.
 4. **Case studies** — SYNEK template in place; flesh out metrics/media. Color Scroller + Ascension still stubs.
 5. **Contact** — Confirm FormSubmit email (`hello@pandji.co` in `contact.html`) and test submit on device.
-6. **About** — Optional portrait; tighten voice after you read it aloud. **`station.html`** stub live (hero palette + footer + lorem) — swap in your copy.
+6. **Station page** — Implement [station-page.md](./station-page.md) Phase A on `station.html` (sky panel, locked transmission, instruments, sitemap, presence). About: optional portrait on `about.html` (deeper than station author block).
 7. **Footer extras** — Decide what lives in `.time-footer__extras` (beyond **⁘** lab / scene-debug — station doc Part Three § Product themes).
 8. **Collections — media & layout QA** — Lazy video / `IntersectionObserver` for many masonry tiles; list layout QA on real devices; Grid L3 vs fallback. [instrument-collections.md](./instrument-collections.md) §9 / §15.
 
@@ -54,7 +54,7 @@ Long specs live elsewhere; **done spec lines** are crossed off in those files (f
 ## Later (not the current queue)
 
 - **Project Longwave / Transmissions** — [project-longwave.md](./project-longwave.md). After mobile + station copy land.
-- **`/station` page — copy & instruments** — Shell at `station.html`; flesh out argument + instrument list (station doc Part Two § Summary).
+- **Station Phase B** — Tone.js ambient, **⁘** → station, Presence from Supabase — [station-page.md](./station-page.md) §10.
 - **Trace · Presence · Webring** — Concept only (station doc Part One).
 - **11ty + optional CMS** — [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md).
 - **Collections Phase 2** — `audience` meta + `?audience=` presets ([instrument-collections.md](./instrument-collections.md) §2.1).

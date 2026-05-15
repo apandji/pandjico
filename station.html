@@ -18,43 +18,66 @@
     <script src="js/adapt-hero.js" fetchpriority="high"></script>
     <script src="js/cursor-typewriter-chip.js" defer></script>
     <script src="js/frost-tooltip.js" defer></script>
+    <script src="js/station-toolbar.js" defer></script>
+    <script src="js/station-day-bar.js" defer></script>
 </head>
-<body>
+<body class="station-body">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="station-page page-split">
-        <main class="station-panel hero" id="main">
-            <p class="station-page__back">
-                <a href="index.html">Index</a>
-            </p>
-
-            <h1>The station</h1>
-
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-            </p>
-            <p>
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                laborum.
-            </p>
-            <p>
-                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo
-                pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris.
-            </p>
-        </main>
-    </div>
-
-    <footer class="time-footer" role="contentinfo">
-        <div class="time-footer__toy" id="footer-toy">
-            <div class="time-footer__inner">
-                <div class="time-footer__row">
-                    <div class="time-footer__group-shell">
-                        <div class="time-footer__group">
-                            <div class="time-footer__sky-wrap">
+        <header class="works-toolbar station-toolbar" aria-label="Station">
+            <div class="works-toolbar__bar">
+                <div class="works-toolbar__rail station-toolbar__rail">
+                    <nav class="works-toolbar__home" aria-label="Site">
+                        <a class="works-toolbar__home-mark" href="index.html" aria-label="Back to home">
+                            <span class="works-toolbar__home-glyph" aria-hidden="true">
+                                <svg
+                                    class="works-toolbar__home-svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <g class="works-toolbar__home-phase works-toolbar__home-phase--dot">
+                                        <circle cx="12" cy="12" r="6" fill="currentColor" />
+                                    </g>
+                                    <g
+                                        class="works-toolbar__home-phase works-toolbar__home-phase--house"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path
+                                            d="M2 8L11.7317 3.13416C11.9006 3.04971 12.0994 3.0497 12.2683 3.13416L22 8"
+                                        />
+                                        <path
+                                            d="M20 11V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V11"
+                                        />
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="works-hover-tip works-home-tip" role="tooltip" aria-hidden="true">
+                                <span class="works-home-tip__text"></span
+                                ><span class="works-home-tip__caret sky-cursor-type__caret" aria-hidden="true"></span>
+                            </span>
+                        </a>
+                    </nav>
+                    <div class="works-toolbar__controls station-toolbar__controls">
+                        <div class="works-toolbar__tag-line station-toolbar__line">
+                            <div class="station-toolbar__cluster">
+                                <nav class="station-toolbar__sections" aria-label="On this page">
+                                    <a class="station-toolbar__jump" href="#station-why">why</a>
+                                    <a class="station-toolbar__jump" href="#station-site">site</a>
+                                    <a class="station-toolbar__jump" href="#station-author">author</a>
+                                </nav>
+                                <p class="station-toolbar__readings" id="station-readings" aria-live="polite">
+                                    <span id="station-readings-text" data-station-readings-text></span>
+                                </p>
+                            </div>
+                            <div class="time-footer__sky-wrap station-toolbar__sky-wrap">
                                 <p class="frost-tooltip sky-ui-chip" id="footer-toy-tip" role="tooltip">
-                                    <span class="frost-tooltip__text">Use my own sky instead</span
+                                    <span class="frost-tooltip__text">use my own sky instead</span
                                     ><span class="frost-tooltip__caret sky-cursor-type__caret" aria-hidden="true"></span>
                                 </p>
                                 <button
@@ -82,66 +105,120 @@
                                     </svg>
                                 </button>
                             </div>
-                            <p class="time-footer__caption" id="footer-caption"></p>
                         </div>
                     </div>
-                    <div class="time-footer__extras" aria-label="Additional footer links or notes" role="region">
+                </div>
+                <div class="station-day-bar" id="station-day-bar">
+                    <p class="station-day-bar__hint" id="station-day-hint" aria-live="polite"></p>
+                    <div class="station-day-bar__track" id="station-day-track">
                         <button
                             type="button"
-                            class="time-footer__extras-dial"
-                            id="footer-extras-dial"
-                            aria-label="Open scene tools"
-                            title="Click: toggle sky &amp; geo lab · Shift+click: toggle scene time slider · Alt+click: turn off lab &amp; scene debug · Or use ?lab=0 / ?sceneDebug=0"
-                        >
-                            ⁘
-                        </button>
+                            class="station-day-bar__marker"
+                            id="station-day-bar-marker"
+                            aria-describedby="station-day-tip"
+                            aria-label="scrub time of day"
+                        ></button>
+                        <div
+                            class="station-day-bar__tip"
+                            id="station-day-tip"
+                            role="tooltip"
+                            aria-hidden="true"
+                        ></div>
                     </div>
                 </div>
-                <p class="time-footer__lab" id="footer-lab" hidden aria-hidden="true"></p>
-                <div class="time-footer__geo-debug" id="footer-geo-debug" hidden aria-hidden="true">
-                    <div class="time-footer__geo-debug-row">
-                        <label class="time-footer__geo-debug-label"
-                            >lat
-                            <input
-                                class="time-footer__geo-debug-input"
-                                id="footer-debug-lat"
-                                type="text"
-                                inputmode="decimal"
-                                autocomplete="off"
-                                spellcheck="false"
-                                aria-label="Debug latitude"
-                            />
-                        </label>
-                        <label class="time-footer__geo-debug-label"
-                            >lon
-                            <input
-                                class="time-footer__geo-debug-input"
-                                id="footer-debug-lon"
-                                type="text"
-                                inputmode="decimal"
-                                autocomplete="off"
-                                spellcheck="false"
-                                aria-label="Debug longitude"
-                            />
-                        </label>
-                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-apply">apply</button>
-                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-random">
-                            random city
-                        </button>
-                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-clear">
-                            clear override
-                        </button>
-                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-copy">
-                            copy coords
-                        </button>
-                    </div>
-                    <p class="time-footer__geo-debug-hint" id="footer-geo-debug-hint"></p>
+            </div>
+            <div class="works-toolbar__head">
+                <h1 class="works-toolbar__title">station</h1>
+            </div>
+        </header>
+
+        <main class="station" id="main">
+            <div class="station__cols">
+                <section aria-labelledby="station-why">
+                    <h1 id="station-why">Why a station?</h1>
+                    <p class="station-meta">first transmission · May 2026</p>
+                    <p>
+                        What started as a site that hosted collections of my work became something else —
+                        personal broadcasting infrastructure.
+                    </p>
+                    <p>
+                        I imagine pandji.co as a station. One that observes, records, and broadcasts. Always located
+                        somewhere specific. Always tended.
+                    </p>
+                    <p>
+                        I wanted to bring some of that early web energy back. The feeling that a site has edges, that
+                        it belongs to a network — legible not just to the author but to anyone who visits. The colors
+                        you're seeing are derived from my sky. You can change them to reflect yours. Eventually the
+                        transmissions and traces from everyone who passes through will be visible too.
+                    </p>
+                    <p>
+                        A station holds instruments. The instruments take readings. The readings are made public.
+                        That's the counterpoint to how the web works now.
+                    </p>
+                    <p>I tend this one.</p>
+                    <p class="station-more-transmissions">more transmissions coming…</p>
+                </section>
+
+                <section aria-labelledby="station-site">
+                    <h1 id="station-site">The site</h1>
+                    <nav class="station-sitemap" aria-label="Site map">
+                        <p class="station-sitemap__label">the work</p>
+                        <ul class="station-sitemap__list">
+                            <li><a href="projects/index.html">made</a></li>
+                        </ul>
+                        <p class="station-sitemap__label">the station</p>
+                        <ul class="station-sitemap__list">
+                            <li><span class="station-sitemap__coming">transmissions</span> <span class="station-sitemap__note">coming</span></li>
+                            <li><span class="station-sitemap__coming">trace</span> <span class="station-sitemap__note">coming</span></li>
+                        </ul>
+                        <p class="station-sitemap__label">elsewhere</p>
+                        <ul class="station-sitemap__list">
+                            <li><a href="about.html">about</a></li>
+                            <li><a href="contact.html">contact</a></li>
+                            <li><a href="cv.html">cv</a></li>
+                            <li>
+                                <a href="https://www.are.na/pandji" target="_blank" rel="noopener noreferrer">are.na</a>
+                                ·
+                                <a href="https://github.com/apandji" target="_blank" rel="noopener noreferrer">github</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </section>
+
+                <section aria-labelledby="station-author">
+                    <h1 id="station-author">The author</h1>
+                    <p>
+                        Andrew Pandji is a creative technologist, artist, and experience design leader based in
+                        St.&nbsp;Louis. His practice is about grounding — designing so people can feel where they are
+                        inside systems that usually remain invisible.
+                    </p>
+                    <p>
+                        He has spent eight years building products that accelerated care and healing, from pre-seed to
+                        one of the largest health systems in America. He is currently researching at the intersection
+                        of embodied interfaces and environmental sensing.
+                    </p>
+                    <p><a href="index.html">Work at pandji.co</a></p>
+                    <p><a href="about.html">About</a></p>
+                    <p><a href="cv.html">CV</a></p>
+                    <p><a href="contact.html">Contact</a></p>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="time-footer time-footer--station" role="contentinfo">
+        <div class="time-footer__toy" id="footer-toy">
+            <div class="time-footer__inner">
+                <div class="time-footer__row time-footer__row--station">
+                    <p class="station-presence" id="station-presence">
+                        <span class="station-presence__mark" aria-hidden="true">◉</span> tended recently
+                    </p>
+                    <p class="time-footer__caption" id="footer-caption"></p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/lab-egg.js" defer></script>
     <script src="js/register-sw.js" defer></script>
 </body>
 </html>

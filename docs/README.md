@@ -14,6 +14,7 @@ Personal web infrastructure for **pandjico** (Andrew Pandji). These docs are the
 | **[mobile-spec.md](./mobile-spec.md)** | Mobile layout, scroll flow, touch, Sky section, project cards — **implement now** |
 | **[project-longwave.md](./project-longwave.md)** | Transmissions publishing (Next.js, Supabase, syndication) — **next build** |
 | **[next-actions.md](./next-actions.md)** | The only ordered task queue (what to do next) |
+| **[station-page.md](./station-page.md)** | **`station.html` PRD** — sections, locked copy, build phases |
 
 Everything else supports one of the above or describes something already shipped.
 
@@ -37,6 +38,7 @@ Everything else supports one of the above or describes something already shipped
 station-concept-and-critique.md     ← north star (why / what / scope)
         │
         ├── mobile-spec.md          ← immediate UX implementation
+        ├── station-page.md         ← station.html PRD (build spec)
         ├── project-longwave.md     ← next system (Transmissions)
         ├── instrument-collections.md   ← shipped Collections subsystem
         │

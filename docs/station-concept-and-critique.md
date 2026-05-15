@@ -2,7 +2,7 @@
 ## Concept Document & Site Critique
 **Working document — not for public distribution yet**
 
-**Role in repo:** North star for identity, instruments, copy voice, architecture, product themes, user stories, and page map. When product choices conflict, this doc wins. **Queue:** [next-actions.md](./next-actions.md). **Doc index:** [README.md](./README.md).
+**Role in repo:** North star for identity, instruments, copy voice, architecture, product themes, user stories, and page map. When product choices conflict, this doc wins. **Station page build spec:** [station-page.md](./station-page.md) (PRD). **Queue:** [next-actions.md](./next-actions.md). **Doc index:** [README.md](./README.md).
 
 ---
 
@@ -319,8 +319,9 @@ Pandji.co is a **station**, not a portfolio: instruments (Sky, Transmissions, Tr
 | Path | Role |
 |------|------|
 | `index.html` | Home: hero, work rail, adaptive footer (station landing; mobile rescope per [mobile-spec.md](./mobile-spec.md)) |
-| `about.html` · `contact.html` · `cv.html` | Shells — About = station concept; CV = practice record |
-| `/station` · `/transmissions` | **Planned** — station home + Longwave stream ([project-longwave.md](./project-longwave.md)) |
+| `about.html` · `contact.html` · `cv.html` | About = deeper bio; Contact · CV = practice record |
+| `station.html` | **In progress** — station interior; PRD [station-page.md](./station-page.md) |
+| `/transmissions` | **Planned** — Longwave stream ([project-longwave.md](./project-longwave.md)) |
 | `projects/*.html` | Case studies; **`tactility-grounding.html`** = SYNEK card until you rename + redirect |
 | `projects/index.html` | **Collections** (All Works v2) — toolbar, masonry + list, `?view=list` — [instrument-collections.md](./instrument-collections.md) |
 
