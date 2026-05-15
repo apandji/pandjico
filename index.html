@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Andrew Pandji — creative technologist, artist, and experience design leader. Works at the intersection of adaptive interfaces, tactility, and wellness.">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f0f2f5">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1016">
+    <meta name="theme-color" id="dynamic-theme-color" content="hsl(232 26% 5%)">
     <title>Andrew Pandji</title>
     <link
         rel="icon"
@@ -14,15 +13,16 @@
         href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Ccircle%20cx%3D'16'%20cy%3D'16'%20r%3D'15'%20fill%3D'hsl(232%2026%25%205%25)'%2F%3E%3C%2Fsvg%3E"
     />
     <link rel="preload" href="fonts/Ronzino-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css">
-    <script src="cursor-typewriter-chip.js" defer></script>
-    <script src="adapt-hero.js" defer></script>
-    <script src="hero-panel-scroll.js" defer></script>
-    <script src="cursor-atmosphere.js" defer></script>
-    <script src="work-cards.js" defer></script>
-    <script src="hero-client-blurbs.js" defer></script>
-    <script src="frost-tooltip.js" defer></script>
-    <script src="sky-typewriter-hint.js" defer></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preload" href="js/adapt-hero.js" as="script" fetchpriority="high">
+    <script src="js/adapt-hero.js" fetchpriority="high"></script>
+    <script src="js/cursor-typewriter-chip.js" defer></script>
+    <script src="js/hero-panel-scroll.js" defer></script>
+    <script src="js/cursor-atmosphere.js" defer></script>
+    <script src="js/work-cards.js" defer></script>
+    <script src="js/hero-client-blurbs.js" defer></script>
+    <script src="js/frost-tooltip.js" defer></script>
+    <script src="js/sky-typewriter-hint.js" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to work</a>
@@ -324,7 +324,17 @@
                         class="time-footer__extras"
                         aria-label="Additional footer links or notes"
                         role="region"
-                    ></div>
+                    >
+                        <button
+                            type="button"
+                            class="time-footer__extras-dial"
+                            id="footer-extras-dial"
+                            aria-label="Open scene tools"
+                            title="Click: toggle sky &amp; geo lab · Shift+click: toggle scene time slider · Alt+click: turn off lab &amp; scene debug · Or use ?lab=0 / ?sceneDebug=0"
+                        >
+                            ⁘
+                        </button>
+                    </div>
                 </div>
                 <p class="time-footer__lab" id="footer-lab" hidden aria-hidden="true"></p>
                 <div class="time-footer__geo-debug" id="footer-geo-debug" hidden aria-hidden="true">
@@ -371,5 +381,7 @@
             </div>
         </div>
     </footer>
+    <script src="js/lab-egg.js" defer></script>
+    <script src="js/register-sw.js" defer></script>
 </body>
 </html>

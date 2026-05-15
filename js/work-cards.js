@@ -115,8 +115,20 @@
         return 1.045;
     }
 
+    function attentionCenterY(vh) {
+        try {
+            if (window.matchMedia("(max-width: 820px)").matches) {
+                /* Stacked layout: hero uses the upper band; bias attention upward so the first work card reads as primary. */
+                return vh * 0.36;
+            }
+        } catch (eMq) {
+            /* ignore */
+        }
+        return vh * 0.5;
+    }
+
     function pickActiveIndex(vh, rects) {
-        var vc = vh * 0.5;
+        var vc = attentionCenterY(vh);
         var bestI = 0;
         var bestS = -1;
         var i;
@@ -164,7 +176,7 @@
         var h = (r && r.height) || 1;
         var ov = Math.min(r.bottom, vh) - Math.max(r.top, 0);
         var vis = clamp(ov / h, 0, 1);
-        var vc = vh * 0.5;
+        var vc = attentionCenterY(vh);
         var mid = (r.top + r.bottom) * 0.5;
         var dist = Math.abs(mid - vc);
         var sigma = vh * 0.4;

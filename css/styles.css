@@ -1,7 +1,7 @@
 /* Ronzino — add more @font-face rules when you use other weights/styles. */
 @font-face {
     font-family: "Ronzino";
-    src: url("./fonts/Ronzino-Regular.woff2") format("woff2");
+    src: url("../fonts/Ronzino-Regular.woff2") format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
     font-family: "Ronzino";
-    src: url("./fonts/Ronzino-Oblique.woff2") format("woff2");
+    src: url("../fonts/Ronzino-Oblique.woff2") format("woff2");
     font-weight: 400;
     font-style: oblique;
     font-display: swap;
@@ -17,7 +17,7 @@
 
 @font-face {
     font-family: "Ronzino";
-    src: url("./fonts/Ronzino-Medium.woff2") format("woff2");
+    src: url("../fonts/Ronzino-Medium.woff2") format("woff2");
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -25,7 +25,7 @@
 
 @font-face {
     font-family: "Ronzino";
-    src: url("./fonts/Ronzino-MediumOblique.woff2") format("woff2");
+    src: url("../fonts/Ronzino-MediumOblique.woff2") format("woff2");
     font-weight: 500;
     font-style: oblique;
     font-display: swap;
@@ -33,7 +33,7 @@
 
 @font-face {
     font-family: "Ronzino";
-    src: url("./fonts/Ronzino-Bold.woff2") format("woff2");
+    src: url("../fonts/Ronzino-Bold.woff2") format("woff2");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -41,7 +41,7 @@
 
 @font-face {
     font-family: "Ronzino";
-    src: url("./fonts/Ronzino-BoldOblique.woff2") format("woff2");
+    src: url("../fonts/Ronzino-BoldOblique.woff2") format("woff2");
     font-weight: 700;
     font-style: oblique;
     font-display: swap;
@@ -993,10 +993,6 @@ html[data-appearance="light"] .hero-name-link:focus-visible {
     transition: color 0.95s var(--ease-scene);
 }
 
-html[data-appearance="light"] .hero > p {
-    color: color-mix(in hsl, hsl(var(--fg-h) var(--fg-s) var(--fg-l)) 92%, hsl(var(--accent-h) var(--accent-s-muted) 42%) 8%);
-}
-
 .hero > p:first-of-type {
     margin-top: var(--rhythm-lg);
 }
@@ -1096,10 +1092,6 @@ html[data-appearance="light"] .hero-clients__link:focus-visible img {
     transition:
         opacity 0.24s var(--ease-tactile),
         visibility 0s linear 0.22s;
-}
-
-html[data-appearance="light"] .hero-clients__blurb {
-    color: color-mix(in hsl, hsl(var(--meta-h) var(--meta-s) var(--meta-l)) 90%, hsl(var(--accent-h) 12% 38%) 10%);
 }
 
 .hero-clients__blurb strong {
@@ -1678,6 +1670,33 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     align-self: center;
     min-width: 0;
     min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.time-footer__extras-dial {
+    margin: 0;
+    padding: 0.2rem 0.35rem;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: calc(var(--text-meta) * 1.05);
+    line-height: 1;
+    letter-spacing: 0.12em;
+    color: hsl(var(--meta-h) var(--meta-s) var(--meta-l) / 0.38);
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition:
+        color 0.2s var(--ease-out-natural),
+        background-color 0.2s var(--ease-out-natural);
+}
+
+.time-footer__extras-dial:hover,
+.time-footer__extras-dial:focus-visible {
+    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.75);
+    background-color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.06);
+    outline: none;
 }
 
 .time-footer__caption {
@@ -1972,7 +1991,8 @@ html[data-appearance="light"] .time-footer__sky-toggle {
     opacity: 0.75;
 }
 
-#tod-sim-slider {
+#tod-sim-slider,
+#tod-temp-sim-slider {
     width: 100%;
 }
 
@@ -1980,7 +2000,8 @@ html[data-appearance="light"] .time-footer__sky-toggle {
     width: 100%;
 }
 
-#tod-sim-slider:disabled {
+#tod-sim-slider:disabled,
+#tod-temp-sim-slider:disabled {
     opacity: 0.35;
     cursor: not-allowed;
 }

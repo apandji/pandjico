@@ -4,15 +4,19 @@
  * — Background: 24 knots H/S/L, eased blend within the hour; 23:00 → 00:00 wraps to midnight blue.
  * — Light/dark: always from civil twilight at the chosen “sky anchor” (no manual theme).
  * — Anchor: St. Louis (America/Chicago) by default, or “your sky” after geolocation (cached in localStorage).
- * — Hourly palette + greetings follow the same anchor’s clock.
+ * — Hourly palette + greetings follow the scene clock (anchor TZ, or lab-resolved TZ when a debug pin is set).
  * — Hero + CTAs: `--accent-*` on `:root` — hue is bg + 180° (complement) on bright panels; bg + ~28° (analogous) when the panel reads dim (same luminance band as inverted client marks) or in full night (`data-appearance="dark"`). S/L are contrast-picked for WCAG; light-on-dark picks favor saturated high-80s L so hue stays visible.
  * — Client logos: tinted monochrome via CSS `filter` (`--logo-hue-rotate` from accent hue); no image libs.
- * — Hover on hero name + scene-arrow links: text shifts to the other accent family (complement ↔ analogous), not a chroma wash (`styles.css`).
+ * — Hover on hero name + scene-arrow links: text shifts to the other accent family (complement ↔ analogous), not a chroma wash (`css/styles.css`).
  * — `.hero` still stores `--hero-h` (= scene bg hue) for legacy hooks; cursor follows computed `.hero` color (accent).
- * — Footer: caption (greeting, date, time, temp, place) + pin toggle; Open-Meteo weather + reverse geocode for place.
+ * — Hourly field: after sun + golden bands, outbound °F (Open-Meteo) nudges H/S/L slightly cooler in winter,
+ *   warmer in summer so one location still drifts with seasons. Prose `--fg-*` / `--meta-*` are then clamped so
+ *   contrast vs `--bg-*` meets WCAG 2.1 AA for body text (~4.5:1 with small headroom for text opacity in CSS).
+ * — Footer: caption (greeting, date, time, temp, place) + pin toggle; Open-Meteo weather; place via Nominatim reverse
+ *   (Open-Meteo has no reverse API). Lab pin also resolves IANA TZ (timeapi.io) so footer + scene clock match the spoofed point.
  * — Playground readout: ?lab=1 | localStorage.lab=1 — extra coordinates line + optional lat/lon override
- *   (footerGeoDebugLat / footerGeoDebugLon) so sun + Open-Meteo use test coords; caption clock still uses anchor TZ.
- * — Scene scrubber (debug): ?sceneDebug=1 | localStorage.sceneDebug=1
+ *   (footerGeoDebugLat / footerGeoDebugLon) so sun, weather, caption place, and scene/footer clock use test coords. ?lab=0 clears the stored flag.
+ * — Scene scrubber (debug): ?sceneDebug=1 | localStorage.sceneDebug=1; ?sceneDebug=0 clears the stored flag.
  * — Hero accent ink (dark on light panels): optional extra L vs WCAG floor — ?accentInkBump=0–14 |
  *   localStorage.accentInkBump (default 5). Scene debug adds a live slider; combine with ?sceneDebug=1
  *   and turn off “Follow local time” to scrub 0–24h.
@@ -30,6 +34,17 @@
                 window.localStorage.removeItem(LAB_STORAGE_KEY);
             }
         } catch (e) {
+            /* ignore */
+        }
+    }
+
+    function initSceneDebugFromQuery() {
+        try {
+            var q = new URLSearchParams(window.location.search);
+            if (q.get("sceneDebug") === "0") {
+                window.localStorage.removeItem("sceneDebug");
+            }
+        } catch (eSd) {
             /* ignore */
         }
     }
@@ -58,6 +73,7 @@
     }
 
     initLabFromQuery();
+    initSceneDebugFromQuery();
     applyLabDataset();
     var hero = document.querySelector(".hero");
     var pageSplit = document.querySelector(".page-split");
@@ -67,6 +83,9 @@
     var FOOTER_GEO_LAT_KEY = "footerGeoLat";
     var FOOTER_GEO_LON_KEY = "footerGeoLon";
     var FOOTER_GEO_PLACE_KEY = "footerGeoPlace";
+    /** Lab-only: caption “in …” + TZ for scene/footer clock while a debug pin is active (separate from real “here” cache). */
+    var FOOTER_GEO_LAB_PLACE_KEY = "footerGeoLabPlace";
+    var FOOTER_GEO_LAB_CAPTION_TZ_KEY = "footerGeoLabCaptionTz";
     var FOOTER_GEO_DEBUG_LAT_KEY = "footerGeoDebugLat";
     var FOOTER_GEO_DEBUG_LON_KEY = "footerGeoDebugLon";
     var STL_LAT = 38.627;
@@ -113,7 +132,7 @@
         return parseLatLonPair(FOOTER_GEO_LAT_KEY, FOOTER_GEO_LON_KEY);
     }
 
-    /** Lab-only: overrides readAnchorLatLon for sun + weather; does not change anchor mode or device TZ. */
+    /** Lab-only: overrides readAnchorLatLon for sun + weather; caption place/TZ use separate lab cache. */
     function readDebugGeoOverride() {
         if (!labPlaygroundEnabled()) {
             return null;
@@ -137,6 +156,7 @@
         } catch (eDbgC) {
             /* ignore */
         }
+        clearLabCaptionCache();
     }
 
     var GEO_DEBUG_PRESETS = [
@@ -180,7 +200,7 @@
         }
         if (readDebugGeoOverride()) {
             hint.textContent =
-                "Override on — sun + weather use these coordinates. Greeting clock still uses the anchor timezone (stl vs here), not the spoofed meridian.";
+                "Override on — sun, weather, footer place, and scene/footer clock follow these coordinates (until you clear the pin).";
         } else {
             hint.textContent =
                 "Apply custom lat/lon or random city to stress-test sky gradient and weather. Clear override or ?lab=0 to stop. Geolocation needs HTTPS and browser permission.";
@@ -223,7 +243,7 @@
             if (isNaN(la) || isNaN(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) {
                 return;
             }
-            clearGeoPlaceCache();
+            clearLabCaptionCache();
             writeDebugGeoOverride(la, lo);
             lastWeatherAttempt = 0;
             tick();
@@ -232,7 +252,7 @@
         });
         btnRand.addEventListener("click", function () {
             var p = pickRandomDebugPreset();
-            clearGeoPlaceCache();
+            clearLabCaptionCache();
             writeDebugGeoOverride(p.lat, p.lon);
             lastWeatherAttempt = 0;
             tick();
@@ -278,6 +298,8 @@
             window.localStorage.setItem(FOOTER_GEO_LAT_KEY, String(lat));
             window.localStorage.setItem(FOOTER_GEO_LON_KEY, String(lon));
             window.localStorage.removeItem(FOOTER_GEO_PLACE_KEY);
+            window.localStorage.removeItem(FOOTER_GEO_LAB_PLACE_KEY);
+            window.localStorage.removeItem(FOOTER_GEO_LAB_CAPTION_TZ_KEY);
         } catch (e4) {
             /* ignore */
         }
@@ -297,6 +319,17 @@
         return readFooterAnchorMode() === "here"
             ? Intl.DateTimeFormat().resolvedOptions().timeZone
             : STL_TZ;
+    }
+
+    /** Scene + footer caption clock: anchor TZ, or lab-resolved TZ when a debug pin is set. */
+    function effectiveSceneTimeZone() {
+        if (readDebugGeoOverride() && labPlaygroundEnabled()) {
+            var labTz = readCachedLabCaptionTz();
+            if (labTz) {
+                return labTz;
+            }
+        }
+        return anchorTimeZone();
     }
 
     function readAnchorLatLon() {
@@ -343,7 +376,7 @@
         if (simSlider && followReal && !followReal.checked) {
             return clockHourFloat();
         }
-        return zonedClockHourFloat(new Date(), anchorTimeZone());
+        return zonedClockHourFloat(new Date(), effectiveSceneTimeZone());
     }
 
     var lastWeatherTempF = null;
@@ -370,39 +403,152 @@
         }
     }
 
-    function readDisplayPlaceLower() {
-        if (readFooterAnchorMode() !== "here" || !readStoredGeoCoords()) {
-            return "st louis";
+    function clearLabCaptionCache() {
+        try {
+            window.localStorage.removeItem(FOOTER_GEO_LAB_PLACE_KEY);
+            window.localStorage.removeItem(FOOTER_GEO_LAB_CAPTION_TZ_KEY);
+        } catch (eLabClr) {
+            /* ignore */
         }
-        return readCachedPlaceLower() || "here";
     }
 
-    function fetchReversePlaceName(lat, lon) {
+    function readCachedLabPlaceLower() {
+        try {
+            var s = window.localStorage.getItem(FOOTER_GEO_LAB_PLACE_KEY);
+            if (s != null && String(s).trim()) {
+                return String(s).trim().toLowerCase();
+            }
+        } catch (eLp) {
+            /* ignore */
+        }
+        return null;
+    }
+
+    function writeCachedLabPlaceLower(name) {
+        try {
+            window.localStorage.setItem(FOOTER_GEO_LAB_PLACE_KEY, String(name).trim().toLowerCase());
+        } catch (eLp2) {
+            /* ignore */
+        }
+    }
+
+    function readCachedLabCaptionTz() {
+        try {
+            var s = window.localStorage.getItem(FOOTER_GEO_LAB_CAPTION_TZ_KEY);
+            if (s != null && String(s).trim()) {
+                return String(s).trim();
+            }
+        } catch (eTz) {
+            /* ignore */
+        }
+        return null;
+    }
+
+    function writeCachedLabCaptionTz(iana) {
+        try {
+            window.localStorage.setItem(FOOTER_GEO_LAB_CAPTION_TZ_KEY, String(iana).trim());
+        } catch (eTz2) {
+            /* ignore */
+        }
+    }
+
+    function formatLatLonPlaceholderLower(lat, lon) {
+        return formatLatLonLine(lat, lon).toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function readDisplayPlaceLower() {
+        var dbg = readDebugGeoOverride();
+        if (dbg) {
+            return readCachedLabPlaceLower() || formatLatLonPlaceholderLower(dbg.lat, dbg.lon);
+        }
+        if (readFooterAnchorMode() === "here" && readStoredGeoCoords()) {
+            return readCachedPlaceLower() || "here";
+        }
+        return "st louis";
+    }
+
+    function nominatimPlaceLabelFromJson(j) {
+        if (!j || typeof j !== "object") {
+            return "";
+        }
+        var addr = j.address;
+        if (addr && typeof addr === "object") {
+            var keys = [
+                "city",
+                "town",
+                "village",
+                "municipality",
+                "suburb",
+                "city_district",
+                "county",
+                "state_district",
+                "state",
+                "country",
+            ];
+            var ki;
+            for (ki = 0; ki < keys.length; ki++) {
+                var v = addr[keys[ki]];
+                if (v && String(v).trim()) {
+                    return String(v).trim().toLowerCase();
+                }
+            }
+        }
+        if (j.name && String(j.name).trim()) {
+            return String(j.name).trim().toLowerCase();
+        }
+        return "";
+    }
+
+    function fetchNominatimPlaceLabel(lat, lon) {
+        var url =
+            "https://nominatim.openstreetmap.org/reverse?lat=" +
+            encodeURIComponent(String(lat)) +
+            "&lon=" +
+            encodeURIComponent(String(lon)) +
+            "&format=jsonv2";
+        return window
+            .fetch(url, {
+                headers: {
+                    "Accept-Language": "en",
+                    "User-Agent": "pandjico/1.0 (https://apandji.github.io/pandjico; portfolio)",
+                },
+            })
+            .then(function (r) {
+                return r.ok ? r.json() : null;
+            })
+            .then(function (j) {
+                return nominatimPlaceLabelFromJson(j);
+            });
+    }
+
+    function fetchCaptionTimeZoneForLatLon(lat, lon) {
+        var url =
+            "https://timeapi.io/api/TimeZone/coordinate?latitude=" +
+            encodeURIComponent(String(lat)) +
+            "&longitude=" +
+            encodeURIComponent(String(lon));
+        return window
+            .fetch(url)
+            .then(function (r) {
+                return r.ok ? r.json() : null;
+            })
+            .then(function (j) {
+                if (j && j.timeZone && String(j.timeZone).trim()) {
+                    return String(j.timeZone).trim();
+                }
+                return "";
+            });
+    }
+
+    function fetchHerePlaceName(lat, lon) {
         if (placeNameFetchInFlight) {
             return;
         }
         placeNameFetchInFlight = true;
-        var url =
-            "https://geocoding-api.open-meteo.com/v1/reverse?latitude=" +
-            encodeURIComponent(String(lat)) +
-            "&longitude=" +
-            encodeURIComponent(String(lon)) +
-            "&language=en";
         try {
-            window
-                .fetch(url)
-                .then(function (r) {
-                    return r.ok ? r.json() : null;
-                })
-                .then(function (j) {
+            fetchNominatimPlaceLabel(lat, lon)
+                .then(function (label) {
                     placeNameFetchInFlight = false;
-                    if (!j || !j.results || !j.results.length) {
-                        tick();
-                        return;
-                    }
-                    var r0 = j.results[0];
-                    var label = r0.name || r0.admin1 || r0.country || "";
-                    label = String(label).trim().toLowerCase();
                     if (label) {
                         writeCachedPlaceLower(label);
                     }
@@ -410,25 +556,65 @@
                 })
                 .catch(function () {
                     placeNameFetchInFlight = false;
+                    tick();
                 });
-        } catch (eRev) {
+        } catch (eHere) {
+            placeNameFetchInFlight = false;
+        }
+    }
+
+    function fetchLabCaptionGeo(lat, lon) {
+        if (placeNameFetchInFlight) {
+            return;
+        }
+        placeNameFetchInFlight = true;
+        try {
+            Promise.all([
+                fetchNominatimPlaceLabel(lat, lon),
+                fetchCaptionTimeZoneForLatLon(lat, lon),
+            ])
+                .then(function (pair) {
+                    placeNameFetchInFlight = false;
+                    var label = pair[0];
+                    var tz = pair[1];
+                    if (label) {
+                        writeCachedLabPlaceLower(label);
+                    }
+                    if (tz) {
+                        writeCachedLabCaptionTz(tz);
+                    }
+                    tick();
+                })
+                .catch(function () {
+                    placeNameFetchInFlight = false;
+                    tick();
+                });
+        } catch (eLab) {
             placeNameFetchInFlight = false;
         }
     }
 
     function maybeRefreshPlaceName() {
+        if (placeNameFetchInFlight) {
+            return;
+        }
+        var dbg = readDebugGeoOverride();
+        if (dbg) {
+            if (readCachedLabPlaceLower()) {
+                return;
+            }
+            fetchLabCaptionGeo(dbg.lat, dbg.lon);
+            return;
+        }
         if (readFooterAnchorMode() !== "here" || !readStoredGeoCoords()) {
             return;
         }
         if (readCachedPlaceLower()) {
             return;
         }
-        if (placeNameFetchInFlight) {
-            return;
-        }
         var g = readStoredGeoCoords();
         if (g) {
-            fetchReversePlaceName(g.lat, g.lon);
+            fetchHerePlaceName(g.lat, g.lon);
         }
     }
 
@@ -460,6 +646,9 @@
                         return;
                     }
                     lastWeatherTempF = Math.round(t);
+                    if (followLiveTemp && followLiveTemp.checked && tempSimSlider) {
+                        tempSimSlider.value = String(lastWeatherTempF);
+                    }
                     tick();
                 })
                 .catch(function () {
@@ -473,6 +662,8 @@
     var followReal = null;
     var simSlider = null;
     var accentBumpSlider = null;
+    var followLiveTemp = null;
+    var tempSimSlider = null;
 
     /** When set (scene-debug slider), overrides URL/localStorage for max accent-ink L bump. */
     var liveAccentInkBump = null;
@@ -515,6 +706,9 @@
     function sceneDebugEnabled() {
         try {
             var q = new URLSearchParams(window.location.search);
+            if (q.get("sceneDebug") === "0") {
+                return false;
+            }
             if (q.get("sceneDebug") === "1" || q.get("debug") === "scene") {
                 return true;
             }
@@ -522,6 +716,60 @@
         } catch (e) {
             return false;
         }
+    }
+
+    function wireSceneDebugSliders() {
+        if (!followReal || !simSlider) {
+            return;
+        }
+        followReal.addEventListener("change", function () {
+            simSlider.disabled = followReal.checked;
+            if (followReal.checked) {
+                simSlider.value = String(
+                    Math.min(100, Math.max(0, Math.round((clockHourFloat() % 24) * (100 / 24)))),
+                );
+            }
+            tick();
+        });
+
+        simSlider.addEventListener("input", function () {
+            if (followReal.checked) {
+                return;
+            }
+            tick();
+        });
+
+        if (followLiveTemp && tempSimSlider) {
+            followLiveTemp.addEventListener("change", function () {
+                tempSimSlider.disabled = followLiveTemp.checked;
+                if (followLiveTemp.checked && lastWeatherTempF != null && !isNaN(lastWeatherTempF)) {
+                    tempSimSlider.value = String(lastWeatherTempF);
+                }
+                tick();
+            });
+            tempSimSlider.addEventListener("input", function () {
+                if (followLiveTemp.checked) {
+                    return;
+                }
+                tick();
+            });
+        }
+    }
+
+    /** °F for seasonal palette tint: live API unless scene-debug “sim °F” is unchecked. */
+    function effectivePaletteTempF() {
+        if (followLiveTemp && tempSimSlider && sceneDebugEnabled() && !followLiveTemp.checked) {
+            var v = parseInt(tempSimSlider.value, 10);
+            if (!isNaN(v)) {
+                return v;
+            }
+        }
+        return lastWeatherTempF;
+    }
+
+    /** °F shown in footer caption (matches palette when simulating). */
+    function captionDisplayTempF() {
+        return effectivePaletteTempF();
     }
 
     function mountSceneDebugUi() {
@@ -550,6 +798,7 @@
         var c4 = document.createElement("code");
         c4.textContent = "?accentInkBump=0–14";
         hint.appendChild(c4);
+        hint.appendChild(document.createTextNode(" · sim outdoor \u00b0F"));
 
         followReal = document.createElement("input");
         followReal.type = "checkbox";
@@ -582,6 +831,39 @@
         row.appendChild(rangeLabel);
         row.appendChild(simSlider);
 
+        followLiveTemp = document.createElement("input");
+        followLiveTemp.type = "checkbox";
+        followLiveTemp.id = "tod-follow-live-temp";
+        followLiveTemp.checked = true;
+
+        var tempCheckLabel = document.createElement("label");
+        tempCheckLabel.className = "tod-sim-check";
+        tempCheckLabel.appendChild(followLiveTemp);
+        tempCheckLabel.appendChild(document.createTextNode(" Follow live weather \u00b0F"));
+
+        var tempRow = document.createElement("div");
+        tempRow.className = "tod-sim-row";
+        var tempRangeLabel = document.createElement("label");
+        tempRangeLabel.className = "tod-sim-range-label";
+        tempRangeLabel.htmlFor = "tod-temp-sim-slider";
+        tempRangeLabel.appendChild(document.createTextNode("Simulate outdoor temp ("));
+        var tempCode = document.createElement("code");
+        tempCode.textContent = "\u221220\u2013110\u00b0F";
+        tempRangeLabel.appendChild(tempCode);
+        tempRangeLabel.appendChild(document.createTextNode(", live off)"));
+
+        tempSimSlider = document.createElement("input");
+        tempSimSlider.type = "range";
+        tempSimSlider.id = "tod-temp-sim-slider";
+        tempSimSlider.min = "-20";
+        tempSimSlider.max = "110";
+        tempSimSlider.step = "1";
+        tempSimSlider.value = String(lastWeatherTempF != null && !isNaN(lastWeatherTempF) ? lastWeatherTempF : 54);
+        tempSimSlider.disabled = true;
+
+        tempRow.appendChild(tempRangeLabel);
+        tempRow.appendChild(tempSimSlider);
+
         var bumpRow = document.createElement("div");
         bumpRow.className = "tod-sim-row";
         var bumpLabel = document.createElement("label");
@@ -604,16 +886,27 @@
         panel.appendChild(hint);
         panel.appendChild(checkLabel);
         panel.appendChild(row);
+        panel.appendChild(tempCheckLabel);
+        panel.appendChild(tempRow);
         panel.appendChild(bumpRow);
-        document.body.appendChild(panel);
 
-        accentBumpSlider.addEventListener("input", function () {
-            liveAccentInkBump = parseInt(accentBumpSlider.value, 10);
-            if (isNaN(liveAccentInkBump)) {
-                liveAccentInkBump = 0;
-            }
-            tick();
-        });
+        function finishSceneDebugMount() {
+            document.body.appendChild(panel);
+            accentBumpSlider.addEventListener("input", function () {
+                liveAccentInkBump = parseInt(accentBumpSlider.value, 10);
+                if (isNaN(liveAccentInkBump)) {
+                    liveAccentInkBump = 0;
+                }
+                tick();
+            });
+            wireSceneDebugSliders();
+        }
+
+        if (document.body) {
+            finishSceneDebugMount();
+        } else {
+            document.addEventListener("DOMContentLoaded", finishSceneDebugMount, { once: true });
+        }
     }
 
     mountSceneDebugUi();
@@ -720,7 +1013,7 @@
         var ll = readAnchorLatLon();
         var altDeg = sunAltitudeDegrees(d, ll.lat, ll.lon);
         var darkSchemeAuto = !(altDeg > -6);
-        var tz = anchorTimeZone();
+        var tz = effectiveSceneTimeZone();
         var hFloat = zonedClockHourFloat(d, tz);
         var goldenMorning = hFloat >= 4 && hFloat <= 11 && altDeg > 0 && altDeg < 12;
         var goldenEvening = hFloat >= 14 && hFloat <= 22 && altDeg > 0 && altDeg < 14;
@@ -788,6 +1081,35 @@
             h: lerpHue(sampled.h, warm, pull),
             s: Math.min(92, sampled.s * (goldenMorning ? 1.1 : 1.04)),
             l: Math.min(94, Math.max(4, sampled.l + (goldenMorning ? 2.2 : -0.45))),
+        };
+    }
+
+    /**
+     * Outbound temperature only: small seasonal bias on the hourly palette (same anchor all year).
+     * Cold → slight pull toward blue-violet; hot → toward warm cream. No-op until `lastWeatherTempF` is set.
+     */
+    function applyTempSeasonTint(sampled, tempF) {
+        if (typeof tempF !== "number" || isNaN(tempF)) {
+            return sampled;
+        }
+        // ~−1 (cold) … +1 (hot); tighter scale than before so seasonal swings read clearly
+        var u = (tempF - 54) / 28;
+        if (u > 1) {
+            u = 1;
+        }
+        if (u < -1) {
+            u = -1;
+        }
+        var coolTarget = 252;
+        var warmTarget = 42;
+        var target = u >= 0 ? warmTarget : coolTarget;
+        var au = Math.abs(u);
+        // Ease so mid-range temps still pick up a visible bias (not only extremes)
+        var pull = (1 - Math.pow(1 - au, 1.35)) * 0.26;
+        return {
+            h: lerpHue(sampled.h, target, pull),
+            s: Math.min(100, Math.max(0, sampled.s + u * 3.2)),
+            l: Math.min(94, Math.max(4, sampled.l + u * 1.5)),
         };
     }
 
@@ -882,6 +1204,73 @@
         var hi = Math.max(lumA, lumB);
         var lo = Math.min(lumA, lumB);
         return (hi + 0.05) / (lo + 0.05);
+    }
+
+    /** WCAG 2.1 AA body text baseline; small multiplier for CSS prose opacity below 1. */
+    var WCAG_AA_BODY_TEXT = 4.5;
+    var WCAG_PROSE_HEADROOM = 1.06;
+
+    /**
+     * Adjust `--fg-*` / `--meta-*` lightness (then chroma) so body copy meets AA against the scene panel.
+     * Runs after golden-hour hue tweaks so temp + time-of-day cannot push prose below target contrast.
+     */
+    function enforceProseWcagAgainstBg(prose, bgH, bgS, bgL) {
+        var minCr = WCAG_AA_BODY_TEXT * WCAG_PROSE_HEADROOM;
+        var bgSr = Math.round(bgS);
+        var lumBg = luminanceFromHsl(bgH, bgSr, bgL);
+        var h = prose.fg.h;
+        var startL = prose.l;
+        var startS = prose.fg.s;
+        function crFor(L, sChroma) {
+            var lumFg = luminanceFromHsl(
+                h,
+                Math.max(0, Math.min(100, sChroma)),
+                Math.max(0, Math.min(100, L)),
+            );
+            return contrastRatio(lumBg, lumFg);
+        }
+        var L = startL;
+        var s = startS;
+        var iter;
+        if (crFor(L, s) >= minCr) {
+            return;
+        }
+        var lightPanel = lumBg > 0.42;
+        for (iter = 0; iter < 90; iter++) {
+            if (crFor(L, s) >= minCr) {
+                prose.l = L;
+                prose.fg.s = s;
+                prose.meta.s = Math.max(2, Math.min(prose.meta.s, s - 1));
+                return;
+            }
+            if (lightPanel) {
+                L = Math.max(4, L - 1);
+            } else {
+                L = Math.min(96, L + 1);
+            }
+        }
+        s = startS;
+        while (s > 2) {
+            s -= 1;
+            L = startL;
+            for (iter = 0; iter < 90; iter++) {
+                if (crFor(L, s) >= minCr) {
+                    prose.l = L;
+                    prose.fg.s = s;
+                    prose.meta.s = Math.max(2, Math.min(prose.meta.s, s - 1));
+                    return;
+                }
+                if (lightPanel) {
+                    L = Math.max(4, L - 1);
+                } else {
+                    L = Math.min(96, L + 1);
+                }
+            }
+        }
+        prose.l = lightPanel ? 10 : 94;
+        prose.fg.s = 0;
+        prose.meta.s = 0;
+        prose.meta.h = prose.fg.h;
     }
 
     /**
@@ -1007,15 +1396,15 @@
         root.style.setProperty("--hero-cursor-fill", rgb);
     }
 
-    var lastFaviconKey = "";
+    var lastSceneChromeKey = "";
 
-    /** Tab icon: circle filled with scene background (same H/S/L as `--bg-*`). */
+    /** Tab icon + `theme-color`: scene background (same H/S/L as `--bg-*`). */
     function syncFaviconFromBg(h, sRound, lPct) {
         var key = String(h) + "-" + String(sRound) + "-" + String(lPct);
-        if (key === lastFaviconKey) {
+        if (key === lastSceneChromeKey) {
             return;
         }
-        lastFaviconKey = key;
+        lastSceneChromeKey = key;
         var fill = "hsl(" + h + " " + sRound + "% " + lPct + "%)";
         var svg =
             "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='" +
@@ -1031,6 +1420,15 @@
             document.head.appendChild(link);
         }
         link.href = href;
+
+        var meta = document.getElementById("dynamic-theme-color");
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.id = "dynamic-theme-color";
+            meta.name = "theme-color";
+            document.head.appendChild(meta);
+        }
+        meta.setAttribute("content", fill);
     }
 
     function applyScene(clockH) {
@@ -1041,6 +1439,7 @@
 
         var sampled = sampleScene(paletteHour);
         sampled = applyGoldenTint(sampled, sunCtx.golden, sunCtx.goldenMorning);
+        sampled = applyTempSeasonTint(sampled, effectivePaletteTempF());
         var bgH = Math.round(sampled.h);
         var bgSNum = sampled.s;
         var bgL = sampled.l;
@@ -1090,6 +1489,7 @@
             prose.fg.s = Math.min(12, Math.round(prose.fg.s + 1));
             prose.meta.s = Math.min(11, Math.round(prose.meta.s + 1));
         }
+        enforceProseWcagAgainstBg(prose, bgH, Math.round(bgSNum), bgLNum);
         root.style.setProperty("--fg-h", String(prose.fg.h));
         root.style.setProperty("--fg-s", prose.fg.s + "%");
         root.style.setProperty("--fg-l", prose.l + "%");
@@ -1265,7 +1665,7 @@
             return;
         }
         var now = new Date();
-        var tz = anchorTimeZone();
+        var tz = effectiveSceneTimeZone();
         var wd = new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short" })
             .format(now)
             .toLowerCase();
@@ -1355,8 +1755,9 @@
             hh +
             ":" +
             mm;
-        if (lastWeatherTempF != null && !isNaN(lastWeatherTempF)) {
-            core += " and " + lastWeatherTempF + "\u00b0 in " + place;
+        var capTemp = captionDisplayTempF();
+        if (capTemp != null && !isNaN(capTemp)) {
+            core += " and " + Math.round(capTemp) + "\u00b0 in " + place;
         } else {
             core += " in " + place;
         }
@@ -1406,8 +1807,8 @@
     }
 
     function trackingPlaceSlug() {
-        var c = readCachedPlaceLower();
-        if (!c) {
+        var c = readDisplayPlaceLower();
+        if (!c || c === "here") {
             return "your location";
         }
         return String(c).replace(/,/g, " ").replace(/\s+/g, " ").trim();
@@ -1504,6 +1905,8 @@
     }
 
     function tick() {
+        hero = document.querySelector(".hero");
+        workRail = document.querySelector(".work-rail");
         var hour = clockHourFloat();
         applyScene(hour);
         updateSceneLegibility(hour);
@@ -1516,154 +1919,162 @@
         maybeRefreshWeather();
     }
 
-    if (followReal && simSlider) {
-        followReal.addEventListener("change", function () {
-            simSlider.disabled = followReal.checked;
-            if (followReal.checked) {
-                simSlider.value = String(
-                    Math.min(100, Math.max(0, Math.round((clockHourFloat() % 24) * (100 / 24)))),
-                );
+    function bindDomDependentChrome() {
+        hero = document.querySelector(".hero");
+        workRail = document.querySelector(".work-rail");
+        initFooterSkyToggle();
+        ensureFooterGeoDebugWired();
+        syncFooterGeoDebugPanel();
+        refreshGeoDebugInputsFromStorage();
+        tick();
+    }
+
+    function startPeriodicTimers() {
+        var SCENE_TICK_MS = 5000;
+        window.setInterval(tick, SCENE_TICK_MS);
+
+        /** Footer clock + greeting: own timer so time still advances when the scene interval is throttled (background tab). */
+        var FOOTER_CLOCK_MS = 1000;
+        window.setInterval(function () {
+            updateFooterCaption(clockHourFloat());
+        }, FOOTER_CLOCK_MS);
+
+        document.addEventListener("visibilitychange", function () {
+            if (!document.hidden) {
+                tick();
             }
-            tick();
         });
+    }
 
-        simSlider.addEventListener("input", function () {
-            if (followReal.checked) {
+    function initHeroPointerInteractions() {
+        hero = document.querySelector(".hero");
+        workRail = document.querySelector(".work-rail");
+        if (!hero || reduceMotion) {
+            return;
+        }
+
+        var scheduled = false;
+        var x = 0;
+        var y = 0;
+
+        var TILT_MAX_X = 3.8;
+        var TILT_MAX_Y = 5.2;
+
+        function applyPointerSpatial() {
+            scheduled = false;
+            var w = window.innerWidth || 1;
+            var h = window.innerHeight || 1;
+            var nx = x / w;
+            var ny = y / h;
+            var rdx = (0.5 - ny) * 2 * TILT_MAX_X;
+            var rdy = (nx - 0.5) * 2 * TILT_MAX_Y;
+            if (workRail) {
+                workRail.style.setProperty("--rail-tilt-x", rdx.toFixed(2) + "deg");
+                workRail.style.setProperty("--rail-tilt-y", rdy.toFixed(2) + "deg");
+            }
+        }
+
+        function scheduleSpatialFromClient(cx, cy) {
+            x = cx;
+            y = cy;
+            if (scheduled) {
                 return;
             }
-            tick();
-        });
-    }
-
-    initFooterSkyToggle();
-    ensureFooterGeoDebugWired();
-    syncFooterGeoDebugPanel();
-    refreshGeoDebugInputsFromStorage();
-    tick();
-
-    var SCENE_TICK_MS = 5000;
-    window.setInterval(tick, SCENE_TICK_MS);
-
-    /** Footer clock + greeting: own timer so time still advances when the scene interval is throttled (background tab). */
-    var FOOTER_CLOCK_MS = 1000;
-    window.setInterval(function () {
-        updateFooterCaption(clockHourFloat());
-    }, FOOTER_CLOCK_MS);
-
-    document.addEventListener("visibilitychange", function () {
-        if (!document.hidden) {
-            tick();
+            scheduled = true;
+            requestAnimationFrame(applyPointerSpatial);
         }
-    });
 
-    if (!hero || reduceMotion) {
-        return;
-    }
-
-    var scheduled = false;
-    var x = 0;
-    var y = 0;
-
-    var TILT_MAX_X = 3.8;
-    var TILT_MAX_Y = 5.2;
-
-    function applyPointerSpatial() {
-        scheduled = false;
-        var w = window.innerWidth || 1;
-        var h = window.innerHeight || 1;
-        var nx = x / w;
-        var ny = y / h;
-        var rdx = (0.5 - ny) * 2 * TILT_MAX_X;
-        var rdy = (nx - 0.5) * 2 * TILT_MAX_Y;
-        if (workRail) {
-            workRail.style.setProperty("--rail-tilt-x", rdx.toFixed(2) + "deg");
-            workRail.style.setProperty("--rail-tilt-y", rdy.toFixed(2) + "deg");
+        function onFinePointerMove(event) {
+            scheduleSpatialFromClient(event.clientX, event.clientY);
         }
-    }
 
-    function scheduleSpatialFromClient(cx, cy) {
-        x = cx;
-        y = cy;
-        if (scheduled) {
+        if (finePointer) {
+            window.addEventListener("pointermove", onFinePointerMove, { passive: true });
             return;
         }
-        scheduled = true;
-        requestAnimationFrame(applyPointerSpatial);
-    }
 
-    function onFinePointerMove(event) {
-        scheduleSpatialFromClient(event.clientX, event.clientY);
-    }
+        var COARSE_MOVE_PX = 14;
+        var VERTICAL_DOMINANCE = 1.15;
+        var tracking = null;
 
-    if (finePointer) {
-        window.addEventListener("pointermove", onFinePointerMove, { passive: true });
-        return;
-    }
-
-    var COARSE_MOVE_PX = 14;
-    var VERTICAL_DOMINANCE = 1.15;
-    var tracking = null;
-
-    function endCoarseTracking(ev) {
-        if (!tracking || ev.pointerId !== tracking.pointerId) {
-            return;
-        }
-        if (tracking.captured) {
-            try {
-                hero.releasePointerCapture(tracking.pointerId);
-            } catch (err) {
-                /* ignore */
-            }
-        }
-        tracking = null;
-    }
-
-    function onHeroPointerDown(ev) {
-        if (tracking || ev.isPrimary === false) {
-            return;
-        }
-        if (ev.pointerType === "mouse") {
-            return;
-        }
-        tracking = {
-            pointerId: ev.pointerId,
-            sx: ev.clientX,
-            sy: ev.clientY,
-            mode: "undecided",
-            captured: false,
-        };
-    }
-
-    function onCoarsePointerMove(ev) {
-        if (!tracking || ev.pointerId !== tracking.pointerId) {
-            return;
-        }
-        var dx = ev.clientX - tracking.sx;
-        var dy = ev.clientY - tracking.sy;
-        var dist = Math.sqrt(dx * dx + dy * dy);
-        if (tracking.mode === "undecided") {
-            if (dist < COARSE_MOVE_PX) {
+        function endCoarseTracking(ev) {
+            if (!tracking || ev.pointerId !== tracking.pointerId) {
                 return;
             }
-            if (Math.abs(dy) > Math.abs(dx) * VERTICAL_DOMINANCE) {
-                tracking = null;
+            if (tracking.captured) {
+                try {
+                    hero.releasePointerCapture(tracking.pointerId);
+                } catch (err) {
+                    /* ignore */
+                }
+            }
+            tracking = null;
+        }
+
+        function onHeroPointerDown(ev) {
+            if (tracking || ev.isPrimary === false) {
                 return;
             }
-            tracking.mode = "tilt";
-            try {
-                hero.setPointerCapture(ev.pointerId);
-                tracking.captured = true;
-            } catch (err) {
-                /* ignore */
+            if (ev.pointerType === "mouse") {
+                return;
+            }
+            tracking = {
+                pointerId: ev.pointerId,
+                sx: ev.clientX,
+                sy: ev.clientY,
+                mode: "undecided",
+                captured: false,
+            };
+        }
+
+        function onCoarsePointerMove(ev) {
+            if (!tracking || ev.pointerId !== tracking.pointerId) {
+                return;
+            }
+            var dx = ev.clientX - tracking.sx;
+            var dy = ev.clientY - tracking.sy;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (tracking.mode === "undecided") {
+                if (dist < COARSE_MOVE_PX) {
+                    return;
+                }
+                if (Math.abs(dy) > Math.abs(dx) * VERTICAL_DOMINANCE) {
+                    tracking = null;
+                    return;
+                }
+                tracking.mode = "tilt";
+                try {
+                    hero.setPointerCapture(ev.pointerId);
+                    tracking.captured = true;
+                } catch (err) {
+                    /* ignore */
+                }
+            }
+            if (tracking && tracking.mode === "tilt") {
+                scheduleSpatialFromClient(ev.clientX, ev.clientY);
             }
         }
-        if (tracking && tracking.mode === "tilt") {
-            scheduleSpatialFromClient(ev.clientX, ev.clientY);
-        }
+
+        hero.addEventListener("pointerdown", onHeroPointerDown, { passive: true });
+        window.addEventListener("pointermove", onCoarsePointerMove, { passive: true });
+        window.addEventListener("pointerup", endCoarseTracking, { passive: true });
+        window.addEventListener("pointercancel", endCoarseTracking, { passive: true });
     }
 
-    hero.addEventListener("pointerdown", onHeroPointerDown, { passive: true });
-    window.addEventListener("pointermove", onCoarsePointerMove, { passive: true });
-    window.addEventListener("pointerup", endCoarseTracking, { passive: true });
-    window.addEventListener("pointercancel", endCoarseTracking, { passive: true });
+    if (document.readyState === "loading") {
+        tick();
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+                bindDomDependentChrome();
+                initHeroPointerInteractions();
+                startPeriodicTimers();
+            },
+            { once: true },
+        );
+    } else {
+        bindDomDependentChrome();
+        initHeroPointerInteractions();
+        startPeriodicTimers();
+    }
 })();

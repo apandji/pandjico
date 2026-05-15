@@ -2,7 +2,7 @@
 
 **Goal:** Make **starting** and **shipping** project case studies easier than hand-maintaining parallel HTML files, while keeping the site **static** (fast, cheap hosting, no runtime CMS on the public site).
 
-**Context today:** Hand-authored HTML (`index.html`, `projects/*.html`), shared `styles.css`, no `package.json` yet.
+**Context today:** Hand-authored HTML (`index.html`, `projects/*.html`), shared `css/styles.css`, no `package.json` yet.
 
 ---
 
@@ -121,7 +121,7 @@ npm init -y
 npm install @11ty/eleventy --save-dev
 ```
 
-Then add `eleventy.config.cjs` with `dir.input`, `dir.output`, and `addPassthroughCopy` for `images`, `fonts`, and your existing `*.js` unless you later bundle them.
+Then add `eleventy.config.cjs` with `dir.input`, `dir.output`, and `addPassthroughCopy` for `images`, `fonts`, and the `js/` folder (plus `css/` if you keep a flat passthrough) unless you later bundle them.
 
 *(Exact config should match the folder layout you choose; avoid writing HTML output into the same tree as unbuilt sources without a clear `src/` vs `_site/` split.)*
 

@@ -4,7 +4,7 @@ Short checklist derived from [user-stories-and-scope.md](./user-stories-and-scop
 
 ## Tonight / first session back
 
-1. **Confirm GitHub Pages** — Site: **https://apandji.github.io/pandjico/** · Repo: **https://github.com/apandji/pandjico** · Settings → Pages should show **main** + **/ (root)**. Wait a minute after first deploy, then hard-refresh.
+1. **GitHub Pages** — Site: **https://apandji.github.io/pandjico/** · Repo: **https://github.com/apandji/pandjico** · Settings → Pages should show **main** + **/ (root)**. *(Deploy path verified in-repo; re-check after any Pages or repo rename.)*
 2. **Custom domain (optional)** — If you use a domain later: repo **Settings → Pages → Custom domain**, then DNS CNAME to `apandji.github.io` (and remove `/pandjico` path or use apex rules as GitHub documents).
 
 ## Content (needs your words)
@@ -17,14 +17,15 @@ Short checklist derived from [user-stories-and-scope.md](./user-stories-and-scop
 
 ## Product / layout
 
-8. **Footer extras** — Put something in `.time-footer__extras` (colophon, “built with…”, extra link) or remove the region if you decide you do not need it.
-9. **Smoke-test geo** — On the deployed HTTPS URL, confirm “here” pin + weather behave; lab `?lab=1` if you still use overrides.
+8. **Footer extras** — **⁘** toggles **lab** (click) and **scene time** debug (Shift+click); **Alt+click** clears both. URLs: `?lab=0`, `?sceneDebug=0` (`js/lab-egg.js`, `adapt-hero.js`).
+9. ~~**Work rail — small viewports**~~ — **Done:** under **820px** width the scroll “attention” line sits at **36%** of viewport height so the **first** work card reads as primary (`attentionCenterY` in `js/work-cards.js`).
+10. **Smoke-test geo** — On the **HTTPS** live site, use **⁘** or `?lab=1`, then the footer **here** pin and geo fields; confirm permission + weather. Geolocation requires a **secure context** (GitHub Pages is HTTPS).
 
 ## Authoring (when you are ready)
 
-10. **11ty + CMS** — Follow [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md): init Eleventy, then add Tina / Decap / Sanity if you want a visual editor.
-11. **Single source for work cards** — Once 11ty exists, drive home rail + project pages from one collection so titles never drift again.
+11. **11ty + CMS** — Follow [authoring-11ty-headless-cms.md](./authoring-11ty-headless-cms.md): init Eleventy, then add Tina / Decap / Sanity if you want a visual editor.
+12. **Single source for work cards** — Once 11ty exists, drive home rail + project pages from one collection so titles never drift again.
 
 ## Maintenance
 
-12. **Update this list** — Check off items here or in `user-stories-and-scope.md` §7 when done.
+13. **Update this list** — Check off items here or in `user-stories-and-scope.md` §7 when done.

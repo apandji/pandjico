@@ -101,9 +101,9 @@
 
 | Item | Notes |
 |------|--------|
-| `adapt-hero.js` | Scene palette, anchor modes, weather, footer caption, lab geo override, footer clock interval |
-| `styles.css` | Footer layout (grid, group, lab, geo-debug) |
-| `frost-tooltip.js` | Pin hint positioning (footer backdrop caveat documented in CSS) |
+| `js/adapt-hero.js` | Scene palette, anchor modes, weather, footer caption, lab geo override, footer clock interval |
+| `css/styles.css` | Footer layout (grid, group, lab, geo-debug) |
+| `js/frost-tooltip.js` | Pin hint positioning (footer backdrop caveat documented in CSS) |
 
 ---
 
@@ -129,9 +129,9 @@
 
 | Conversation thread | Primary artifacts |
 |---------------------|-------------------|
-| Grouped footer + geo + lab | `index.html` (structure), `adapt-hero.js` (anchor, geo, lab keys), `styles.css` (footer) |
-| Clock frozen vs temp | `adapt-hero.js` (`updateFooterCaption`, `FOOTER_CLOCK_MS`) |
-| Centered footer | `styles.css` (`.time-footer__row` grid, alignment) |
+| Grouped footer + geo + lab | `index.html` (structure), `js/adapt-hero.js` (anchor, geo, lab keys), `css/styles.css` (footer) |
+| Clock frozen vs temp | `js/adapt-hero.js` (`updateFooterCaption`, `FOOTER_CLOCK_MS`) |
+| Centered footer | `css/styles.css` (`.time-footer__row` grid, alignment) |
 
 ---
 
@@ -145,6 +145,8 @@ Work that can advance **without** your intervention: consistency fixes, stubs, a
 | **US-B2** | Extras region has `role="region"` + `aria-label` for future content | What to put in `.time-footer__extras` |
 | **Phase 4 lab** | **copy coords** button (effective `readAnchorLatLon`, 5 dp) | — |
 | **Polish** | Ascension blurb typo (“lifrom” → “from”, spacing); `cv.html` uses `project-page` + back link + title; `contact` / project list use `data-appearance="dark"` with index | Contact copy, CV file or embed |
+| **Work rail (small viewports)** | `attentionCenterY` @ max-width 820px in `js/work-cards.js` | Fine-tune 0.36 factor if devices still mis-read |
+| **Footer lab easter egg** | `⁘` toggles lab + scene debug; `?lab=0` / `?sceneDebug=0`; Alt+click clears | — |
 | **US-A–C, B1** | Already implemented in earlier sessions | — |
 | **US-D2, US-E** | — | Your words or 11ty/CMS setup |
 
