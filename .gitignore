@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+# Eleventy (when you add a build step)
+_site/
+dist/
+# Raw SYNEK storyboard frames (see scripts/build-synek-loop-gif.sh); commit the built GIF instead.
+images/projects/synek-frames/

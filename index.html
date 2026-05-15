@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" data-appearance="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Andrew Pandji — creative technologist, artist, and experience design leader. Works at the intersection of adaptive interfaces, tactility, and wellness.">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f0f2f5">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1016">
+    <title>Andrew Pandji</title>
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        id="dynamic-favicon"
+        href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Ccircle%20cx%3D'16'%20cy%3D'16'%20r%3D'15'%20fill%3D'hsl(232%2026%25%205%25)'%2F%3E%3C%2Fsvg%3E"
+    />
+    <link rel="preload" href="fonts/Ronzino-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="styles.css">
+    <script src="cursor-typewriter-chip.js" defer></script>
+    <script src="adapt-hero.js" defer></script>
+    <script src="hero-panel-scroll.js" defer></script>
+    <script src="cursor-atmosphere.js" defer></script>
+    <script src="work-cards.js" defer></script>
+    <script src="hero-client-blurbs.js" defer></script>
+    <script src="frost-tooltip.js" defer></script>
+    <script src="sky-typewriter-hint.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to work</a>
+    <div class="page-split">
+        <aside class="hero-panel" aria-label="Introduction">
+            <section class="hero" id="intro">
+                <h1>
+                    I'm&nbsp;<a class="hero-name-link" href="about.html"><em>Andrew&nbsp;Pandji</em></a>&nbsp;—&nbsp;a creative technologist,<wbr> artist &amp;<wbr> experience design leader.
+                </h1>
+                <p>
+                    Based in St. Louis with a career spanning brand, product, and health tech — eight-plus years building tools that accelerated care and healing. Now focused on interfaces that center tactility and grounding.
+                </p>
+
+                <div class="hero-clients__group">
+                    <ul class="hero-clients">
+                        <li class="hero-clients__item">
+                            <div class="hero-clients__wrap">
+                                <a
+                                    class="hero-clients__link"
+                                    href="https://www.ascension.org/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="Ascension — Seven-plus years transforming digital experience at one of the largest US health systems — from patient-facing pharmacy tools to complex clinician workflows. (opens in new tab)"
+                                >
+                                    <img
+                                        src="images/clients/logo_ascension.png"
+                                        width="200"
+                                        height="56"
+                                        alt="Ascension"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </a>
+                            </div>
+                        </li>
+                        <li class="hero-clients__item">
+                            <div class="hero-clients__wrap">
+                                <a
+                                    class="hero-clients__link"
+                                    href="https://www.tcare.com/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="TCARE — At TCARE, I led product through pre-seed into Seed and Series A: pilots, proof of concept, and growth (opens in new tab)"
+                                >
+                                    <img
+                                        src="images/clients/logo_tcare.png"
+                                        width="200"
+                                        height="56"
+                                        alt="TCARE"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="hero-clients__blurbs">
+                        <p class="hero-clients__blurb hero-clients__blurb--asc" aria-hidden="true">
+                            Seven-plus years transforming digital experience at one of the largest US health systems — from pharmacy to clinical tools to virtual care.
+                        </p>
+                        <p class="hero-clients__blurb hero-clients__blurb--tcare" aria-hidden="true">
+                            I led product through pre-seed stage, ran pilots with early customers and helped lay the groundwork for Seed &amp; Series A growth.
+                        </p>
+                    </div>
+                </div>
+
+                <nav class="hero-cta" aria-label="Work and contact">
+                    <a class="scene-arrow-link" href="#main">
+                        <span class="scene-arrow-link__label">See what I'm working on</span>
+                        <svg
+                            class="scene-arrow-link__arrow"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </a>
+                    <a class="scene-arrow-link" href="contact.html">
+                        <span class="scene-arrow-link__label">Let's work together</span>
+                        <svg
+                            class="scene-arrow-link__arrow"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </a>
+                    <div class="hero-cta__elsewhere" role="group" aria-label="Elsewhere">
+                        <a class="hero-cta__mini" href="cv.html">cv</a>
+                        <span class="hero-cta__elsewhere-sep" aria-hidden="true">·</span>
+                        <a
+                            class="hero-cta__mini"
+                            href="https://www.are.na/pandji"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            >are.na</a>
+                        <span class="hero-cta__elsewhere-sep" aria-hidden="true">·</span>
+                        <a
+                            class="hero-cta__mini"
+                            href="https://github.com/apandji"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            >github</a>
+                    </div>
+                </nav>
+            </section>
+        </aside>
+
+        <main class="work-rail" id="main">
+            <h2 class="visually-hidden">Selected work</h2>
+
+            <!--
+                Work cards: order is title → description → tags (below copy). Keep tag <li> text aligned with
+                aria-label (after the title, before "open project"). A generator can emit from one source (e.g. tags: in frontmatter).
+            -->
+            <a
+                class="work-card"
+                href="projects/sensory-language.html"
+                aria-label="Color Scroller — experimental — open project"
+            >
+                <figure class="work-card__figure">
+                    <video
+                        class="work-card__loop-video"
+                        muted
+                        playsinline
+                        loop
+                        autoplay
+                        preload="auto"
+                        poster="images/projects/color-scroller-thumb.jpg"
+                        aria-hidden="true"
+                    >
+                        <source src="images/projects/color-scroller-loop.mp4" type="video/mp4" />
+                        <source src="images/projects/Pandji_Andrew_ColorScroller_4.MOV" type="video/quicktime" />
+                    </video>
+                </figure>
+                <div class="work-card__overlay" aria-hidden="true">
+                    <span class="work-card__title">Color Scroller</span>
+                    <p class="work-card__desc">Scroll until stopping feels inevitable—then notice what the interface trained you to do.</p>
+                    <ul class="work-card__tags">
+                        <li class="work-card__tag">experimental</li>
+                    </ul>
+                    <p class="work-card__hint">Tap again to open</p>
+                </div>
+            </a>
+
+            <a
+                class="work-card"
+                href="projects/adaptive-interfaces.html"
+                aria-label="Ascension Video Chat — health — open project"
+            >
+                <figure class="work-card__figure">
+                    <video
+                        class="work-card__loop-video"
+                        muted
+                        playsinline
+                        loop
+                        autoplay
+                        preload="auto"
+                        poster="images/projects/ascension-videochat-card-poster.jpg"
+                        width="1600"
+                        height="1000"
+                        aria-hidden="true"
+                    >
+                        <source src="images/projects/ascension-videochat-card.mp4" type="video/mp4" />
+                    </video>
+                </figure>
+                <div class="work-card__overlay" aria-hidden="true">
+                    <span class="work-card__title">Ascension Video Chat</span>
+                    <p class="work-card__desc">Run a day of telehealth without losing the thread between queue, chart, and video.</p>
+                    <ul class="work-card__tags">
+                        <li class="work-card__tag">health</li>
+                    </ul>
+                    <p class="work-card__hint">Tap again to open</p>
+                </div>
+            </a>
+
+            <a
+                class="work-card"
+                href="projects/tactility-grounding.html"
+                aria-label="SYNEK launch campaign — brand — open project"
+            >
+                <figure class="work-card__figure">
+                    <picture>
+                        <source type="image/webp" srcset="images/projects/synek-story.webp" />
+                        <img
+                            src="images/projects/synek-story-poster.jpg"
+                            width="1920"
+                            height="1200"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </picture>
+                </figure>
+                <div class="work-card__overlay" aria-hidden="true">
+                    <span class="work-card__title">SYNEK launch campaign</span>
+                    <p class="work-card__desc">Brand a beer-dispenser startup from Kickstarter through an international tour—identity, campaign, touchpoints.</p>
+                    <ul class="work-card__tags">
+                        <li class="work-card__tag">brand</li>
+                    </ul>
+                    <p class="work-card__hint">Tap again to open</p>
+                </div>
+            </a>
+
+            <div class="work-rail-more">
+                <a class="scene-arrow-link" href="projects/index.html">
+                    <span class="scene-arrow-link__label">see all works</span>
+                    <svg
+                        class="scene-arrow-link__arrow"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="time-footer" role="contentinfo">
+        <div class="time-footer__toy" id="footer-toy">
+            <div class="time-footer__inner">
+                <div class="time-footer__row">
+                    <div class="time-footer__group">
+                        <div class="time-footer__sky-wrap">
+                            <p
+                                class="frost-tooltip sky-ui-chip"
+                                id="footer-toy-tip"
+                                role="tooltip"
+                            >
+                                <span class="frost-tooltip__text"
+                                    >site's colors change based on time of day; default is my home, st. louis, where this
+                                    site was crafted. click to use your own sky instead.</span>
+                            </p>
+                            <button
+                                type="button"
+                                class="time-footer__sky-toggle"
+                                id="footer-sky-toggle"
+                                aria-pressed="false"
+                                aria-label="Use your local sky instead of St. Louis"
+                            >
+                                <svg
+                                    class="time-footer__sky-svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M20 10C20 14.4183 12 22 12 22C12 22 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                    ></path>
+                                    <path
+                                        d="M12 11C12.5523 11 13 10.5523 13 10C13 9.44772 12.5523 9 12 9C11.4477 9 11 9.44772 11 10C11 10.5523 11.4477 11 12 11Z"
+                                        fill="currentColor"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="time-footer__caption" id="footer-caption"></p>
+                    </div>
+                    <div
+                        class="time-footer__extras"
+                        aria-label="Additional footer links or notes"
+                        role="region"
+                    ></div>
+                </div>
+                <p class="time-footer__lab" id="footer-lab" hidden aria-hidden="true"></p>
+                <div class="time-footer__geo-debug" id="footer-geo-debug" hidden aria-hidden="true">
+                    <div class="time-footer__geo-debug-row">
+                        <label class="time-footer__geo-debug-label"
+                            >lat
+                            <input
+                                class="time-footer__geo-debug-input"
+                                id="footer-debug-lat"
+                                type="text"
+                                inputmode="decimal"
+                                autocomplete="off"
+                                spellcheck="false"
+                                aria-label="Debug latitude"
+                            />
+                        </label>
+                        <label class="time-footer__geo-debug-label"
+                            >lon
+                            <input
+                                class="time-footer__geo-debug-input"
+                                id="footer-debug-lon"
+                                type="text"
+                                inputmode="decimal"
+                                autocomplete="off"
+                                spellcheck="false"
+                                aria-label="Debug longitude"
+                            />
+                        </label>
+                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-apply">
+                            apply
+                        </button>
+                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-random">
+                            random city
+                        </button>
+                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-clear">
+                            clear override
+                        </button>
+                        <button type="button" class="time-footer__geo-debug-btn" id="footer-debug-copy">
+                            copy coords
+                        </button>
+                    </div>
+                    <p class="time-footer__geo-debug-hint" id="footer-geo-debug-hint"></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
