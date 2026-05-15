@@ -2,7 +2,11 @@
 
 The site is **static** (HTML/CSS/JS at the repository root). No build step is required for the current setup.
 
+**Published URL:** https://apandji.github.io/pandjico/
+
 ## After the first push
+
+Pages is configured to deploy from **`main`** at **`/` (root)**. If you ever need to reconfigure:
 
 1. On GitHub open the repo → **Settings** → **Pages** (sidebar).
 2. Under **Build and deployment**:
