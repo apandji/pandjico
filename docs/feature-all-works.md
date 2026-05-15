@@ -1,6 +1,6 @@
 # Feature: All Works (project index)
 
-**Status:** **v1 MVP shipped** (May 2026) — split hero + horizontal **`.work-rail`**. **v2 direction (spec in progress):** top **filter bar**, **two views** — **masonry** (**default**; native [CSS Grid Level 3](https://www.w3.org/TR/css-grid-3/) where supported) and **list** (index style like [Laurel Schwulst — Everything](https://laurelschwulst.com/e/)). Lazy media + a11y carry forward; rail-only `work-cards.js` attention may not apply to list rows.  
+**Status:** **v1 MVP shipped** (May 2026) — split hero + horizontal **`.work-rail`**. **v2 layout shipped** (May 2026): top **filter bar**, **masonry** (**default**; Grid L3 masonry + fallback) + **list** view, URL state. **May 16 update:** mosaic **spotlight** (hover / focus / touch), **`desc`** on tiles, **View Transitions** toward project pages (Chromium-first), home **toolbar** mark + typewriter tips. **Still open:** lazy media at scale (§9), list QA, `audience` Phase 2 (§2.1). Rail scroll-attention stays **off** inside `.works-masonry` (`work-cards.js`); gallery uses discrete CSS spotlight instead.  
 **Owner:** Andrew  
 **Related:** [user-stories-and-scope.md](./user-stories-and-scope.md), [next-actions.md](./next-actions.md) (active queue), `index.html`, `projects/index.html`, `projects/projects.json`, `js/works-index.js`, `js/work-cards.js`
 
@@ -10,7 +10,7 @@
 
 **All Works v1 (shipped)** uses **`projects/index.html`**: same **adaptive scene + footer** as home, a **left hero** with “All works” + tag/sort controls, and a **horizontal work rail** of home-shaped **`.work-card`** links (`work-cards.js` attention + `work-rail-updated`).
 
-**All Works v2 (planned rescope)** — see **§15**: replace the split-column chrome with a **compact filter bar** under the page title; main content is either a **masonry mosaic** (**default**) or a **dense list** (year + title + tags, [Laurel Schwulst — Everything](https://laurelschwulst.com/e/)-like). **Keep:** JSON manifest, OR tags, sort, URL sync, drafts, footer/scene parity. **Revisit:** lazy media strategy per view, mobile behavior (no horizontal rail in list mode), and how much home **`.work-card`** markup is reused vs a slimmer list row component.
+**All Works v2 (layout shipped; polish ongoing)** — see **§15**: **compact filter bar**, **masonry** (**default**) or **list** (year + title + tags, [Laurel Schwulst — Everything](https://laurelschwulst.com/e/)-like). **Shipped:** JSON manifest, OR tags, sort, URL sync, drafts, mosaic spotlight + desc peek + view transitions. **Revisit:** lazy media per view (§9), list mobile QA, optional slimmer list row markup.
 
 **Scale:** ~**20+** entries → lazy media and layout performance remain requirements (§9).
 

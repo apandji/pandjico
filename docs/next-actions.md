@@ -4,6 +4,18 @@
 
 ---
 
+## Tomorrow (2026-05-16)
+
+Start here after sync — short punch list:
+
+1. **Pull + Pages** — `git pull`; confirm https://apandji.github.io/pandjico/ loads; hard-refresh once (service worker).  
+2. **HTTPS smoke** — Footer **Here** pin; **⁘** / `?lab=1` random city (needs secure context).  
+3. **Case study + VT** — Pick one `projects/*.html` stub: flesh body as the template; add `<meta name="view-transition" content="same-origin">` + a hero `view-transition-name` that pairs with mosaic cards (`work-<slug>`).  
+4. **All Works remaining polish** — Lazy video / `IntersectionObserver` for many masonry tiles; list layout QA on a real phone; spot-check Grid L3 masonry vs fallback.  
+5. **Content queue** — Contact page, CV, About (see **Active** below for wording).
+
+---
+
 ## Using this with Cursor
 
 - Keep **numbered items** under **Active** in priority order (1 = next unless you say otherwise).
@@ -21,7 +33,7 @@
 5. **One full case study** — SYNEK or Color Scroller: replace stub body in the matching `projects/*.html` as the template for the rest.
 6. **SYNEK URL** — Keep `tactility-grounding.html` or rename; update home card + `projects/projects.json` + redirect if anything external used the old slug.
 7. **Footer extras** — Decide what lives in `.time-footer__extras` (beyond **⁘** lab / scene-debug behavior documented in [user-stories-and-scope.md](./user-stories-and-scope.md)).
-8. **All Works v2 — polish** — Lazy video / `IntersectionObserver` for many masonry tiles; list layout QA on real devices; confirm native masonry in browsers that ship [Grid L3](https://www.w3.org/TR/css-grid-3/) (fallback is multicol today). [feature-all-works.md](./feature-all-works.md) §9 / §15.
+8. **All Works — media & layout QA** — Lazy video / `IntersectionObserver` for many masonry tiles; list layout QA on real devices; confirm native masonry in browsers that ship [Grid L3](https://www.w3.org/TR/css-grid-3/) (fallback is multicol today). Spotlight / desc / view transitions **shipped** (see Done). [feature-all-works.md](./feature-all-works.md) §9 / §15.
 
 ---
 
@@ -31,6 +43,7 @@
 |------|------|
 | 2026-05-14 | **All Works MVP** — `projects/index.html` + `projects/projects.json` + `js/works-index.js` + `work-cards.js` rail refresh + `css/styles.css` + `sw.js` precache bump. Spec checklist crossed off in [feature-all-works.md](./feature-all-works.md). |
 | 2026-05-15 | **All Works v2** — Top toolbar, **masonry default** (multicol fallback + `@supports (grid-template-rows: masonry)`), **list** rows, `?view=list`, `data-works-layout` + `work-cards.js` host query; removed split hero / `hero-panel-scroll` on this page. [feature-all-works.md](./feature-all-works.md) §15. |
+| 2026-05-16 | **All Works mosaic + nav chrome** — Masonry **spotlight** (hover / focus / touch: scale, z-index, peers recede); **`desc`** on tiles; **View Transitions** (`document.startViewTransition` + per-card `view-transition-name` + same-origin meta); **home** link SVG morph + rotating typewriter tips + tooltip hit fixes; `STATIC_CACHE` bumps. |
 
 ---
 
