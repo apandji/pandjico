@@ -1,4 +1,5 @@
 .DS_Store
+**/.DS_Store
 node_modules/
 # Eleventy (when you add a build step)
 _site/

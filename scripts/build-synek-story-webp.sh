@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Animated WebP “story” from `images/projects/synek images/` (better than GIF for color + sharpness).
+# Animated WebP “story” from `images/projects/synek-source/` (better than GIF for color + sharpness).
 #
 # — Most slides: scale + center-crop to fill the 16:10 canvas (full-bleed).
 # — Ultra-wide only (aspect iw/ih > SYNEK_PAD_IF_WIDE): contain + cream letterbox (banner-style).
@@ -19,7 +19,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SRC="$ROOT/images/projects/synek images"
+SRC="$ROOT/images/projects/synek-source"
 OUT_WEBP="${1:-$ROOT/images/projects/synek-story.webp}"
 OUT_POSTER="$ROOT/images/projects/synek-story-poster.jpg"
 W="${SYNEK_STORY_W:-1920}"

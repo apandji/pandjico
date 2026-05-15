@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build a looping “thumbnail story” GIF from `images/projects/synek images/`.
+# Build a looping “thumbnail story” GIF from `images/projects/synek-source/`.
 # — Each slide is scaled down and letterboxed to a fixed 16:10 frame (matches work-card figure).
 # — Edit the `frames` array below to change order or add/remove shots.
 # Optional env:
@@ -12,7 +12,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SRC="$ROOT/images/projects/synek images"
+SRC="$ROOT/images/projects/synek-source"
 OUT="${1:-$ROOT/images/projects/synek-story.gif}"
 W="${SYNEK_STORY_W:-1920}"
 H="${SYNEK_STORY_H:-1200}"
