@@ -33,14 +33,14 @@
         }
     },
     {
-        "href": "tactility-grounding.html",
+        "href": "synek-launch.html",
         "title": "SYNEK launch campaign",
         "year": 2022,
         "season": "fall",
         "tags": ["brand"],
         "collection": "identity",
         "draft": false,
-        "desc": "Brand a beer-dispenser startup from Kickstarter through an international tour—identity, campaign, touchpoints.",
+        "desc": "Make a countertop beer system feel inevitable on a shelf and on a stage—identity, campaign, and touchpoints from Kickstarter through tour.",
         "media": {
             "type": "image",
             "webp": "../images/projects/synek-story.webp",

@@ -1,68 +1,7 @@
 /**
- * Touch / coarse pointers: first tap opens the overlay; second tap follows href.
- * Delegated on `document` so dynamically rendered `.work-card` nodes (e.g. All works) work without rebind.
+ * Touch / coarse pointers: cards navigate on first tap (station + mobile-spec).
+ * Overlay copy stays visible on narrow viewports via CSS.
  */
-(function () {
-    var mq = window.matchMedia("(hover: hover)");
-    if (mq.matches) {
-        return;
-    }
-
-    document.addEventListener(
-        "click",
-        function (e) {
-            var card = e.target.closest && e.target.closest(".work-card");
-            if (card) {
-                if (card.classList.contains("is-touch-open")) {
-                    card.classList.remove("is-touch-open");
-                    try {
-                        window.dispatchEvent(new CustomEvent("work-card-attention"));
-                    } catch (e0) {
-                        /* ignore */
-                    }
-                    return;
-                }
-                e.preventDefault();
-                document.querySelectorAll(".work-card.is-touch-open").forEach(function (c) {
-                    c.classList.remove("is-touch-open");
-                });
-                card.classList.add("is-touch-open");
-                try {
-                    window.dispatchEvent(new CustomEvent("work-card-attention"));
-                } catch (e1) {
-                    /* ignore */
-                }
-            } else {
-                var hadOpen = document.querySelector(".work-card.is-touch-open");
-                document.querySelectorAll(".work-card.is-touch-open").forEach(function (c) {
-                    c.classList.remove("is-touch-open");
-                });
-                if (hadOpen) {
-                    try {
-                        window.dispatchEvent(new CustomEvent("work-card-attention"));
-                    } catch (e2) {
-                        /* ignore */
-                    }
-                }
-            }
-        },
-        true,
-    );
-
-    document.addEventListener("keydown", function (e) {
-        if (e.key !== "Escape") {
-            return;
-        }
-        document.querySelectorAll(".work-card.is-touch-open").forEach(function (c) {
-            c.classList.remove("is-touch-open");
-        });
-        try {
-            window.dispatchEvent(new CustomEvent("work-card-attention"));
-        } catch (e3) {
-            /* ignore */
-        }
-    });
-})();
 
 /**
  * Work rail scroll “attention”: primary card near viewport center, soft scale, blur on siblings.
@@ -179,9 +118,6 @@
 
         for (i = 0; i < cards.length; i++) {
             el = cards[i];
-            if (el.classList.contains("is-touch-open")) {
-                return i;
-            }
             r = rects[i];
             if (!r) {
                 continue;
@@ -215,10 +151,6 @@
         var dist = Math.abs(mid - vc);
         var sigma = vh * 0.4;
         var w = Math.exp(-(dist * dist) / (2 * sigma * sigma)) * (0.2 + 0.8 * vis);
-
-        if (el.classList.contains("is-touch-open")) {
-            return { sh: 0, sc: 1, op: 1, bl: 0, sat: 1 };
-        }
 
         if (i === activeIdx) {
             return {

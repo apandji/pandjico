@@ -22,6 +22,7 @@
     <script src="js/work-cards.js" defer></script>
     <script src="js/hero-client-blurbs.js" defer></script>
     <script src="js/frost-tooltip.js" defer></script>
+    <script src="js/mobile-home.js" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to work</a>
@@ -31,12 +32,32 @@
                 <h1>
                     I'm&nbsp;<a class="hero-name-link" href="about.html"><em>Andrew&nbsp;Pandji</em></a>&nbsp;—&nbsp;a creative technologist, artist &amp; experience&nbsp;design&nbsp;leader.
                 </h1>
-                <p>
+                <p class="hero__lede hero__lede--desktop">
                     <strong>I tend this station, where that practice lives.</strong> Currently I’m researching interfaces that bring legibility to invisible&nbsp;systems. I center tactility, grounding and care in my work.<br><br>
                     Before this I spent eight&nbsp;years building products that accelerated care and healing across the entire scale of impact. From pre&#8209;seed to one of the largest health&nbsp;systems in America.
                 </p>
+            </section>
 
-                <div class="hero-clients__group">
+            <section class="mobile-sky-band mobile-only" aria-labelledby="mobile-sky-heading">
+                    <h2 class="visually-hidden" id="mobile-sky-heading">How this place works</h2>
+                    <p class="mobile-sky-band__pulse" aria-hidden="true"></p>
+                    <div class="mobile-sky-band__copy">
+                        <p>
+                            This site’s colors change with the time of day and temperature of the sky above you.
+                        </p>
+                        <p>Right now it’s set to St.&nbsp;Louis — where this was made.</p>
+                        <button type="button" class="mobile-sky-band__btn" id="mobile-sky-use">
+                            Use my sky
+                        </button>
+                        <p class="mobile-sky-band__denied" id="mobile-sky-denied" hidden>
+                            No worries — St.&nbsp;Louis skies are good skies.
+                        </p>
+                    </div>
+            </section>
+
+            <p class="mobile-comeback mobile-only">Come back tonight. The sky will be different.</p>
+
+            <div class="hero-clients__group">
                     <ul class="hero-clients">
                         <li class="hero-clients__item">
                             <div class="hero-clients__wrap">
@@ -89,7 +110,7 @@
                     </div>
                 </div>
 
-                <nav class="hero-cta" aria-label="Work and contact">
+                <nav class="hero-cta hero-cta--desktop" aria-label="Work and contact">
                     <a class="scene-arrow-link" href="#main">
                         <span class="scene-arrow-link__label">See what I'm working on</span>
                         <svg
@@ -145,8 +166,7 @@
                             rel="noopener noreferrer"
                             >github</a>
                     </div>
-                </nav>
-            </section>
+            </nav>
         </aside>
 
         <main class="work-rail" id="main" data-works-layout="masonry">
@@ -182,7 +202,6 @@
                     <ul class="work-card__tags">
                         <li class="work-card__tag">experimental</li>
                     </ul>
-                    <p class="work-card__hint">Tap again to open</p>
                 </div>
             </a>
 
@@ -213,13 +232,12 @@
                     <ul class="work-card__tags">
                         <li class="work-card__tag">health</li>
                     </ul>
-                    <p class="work-card__hint">Tap again to open</p>
                 </div>
             </a>
 
             <a
                 class="work-card"
-                href="projects/tactility-grounding.html"
+                href="projects/synek-launch.html"
                 aria-label="SYNEK launch campaign — brand — open project"
             >
                 <figure class="work-card__figure">
@@ -237,13 +255,34 @@
                 </figure>
                 <div class="work-card__overlay" aria-hidden="true">
                     <span class="work-card__title">SYNEK launch campaign</span>
-                    <p class="work-card__desc">Brand a beer-dispenser startup from Kickstarter through an international tour—identity, campaign, touchpoints.</p>
+                    <p class="work-card__desc">Make a countertop beer system feel inevitable on a shelf and on a stage—identity, campaign, and touchpoints from Kickstarter through tour.</p>
                     <ul class="work-card__tags">
                         <li class="work-card__tag">brand</li>
                     </ul>
-                    <p class="work-card__hint">Tap again to open</p>
                 </div>
             </a>
+
+            <section class="mobile-contact mobile-only" aria-labelledby="mobile-contact-heading">
+                <h2 class="visually-hidden" id="mobile-contact-heading">Contact</h2>
+                <p class="mobile-contact__focus">
+                    Currently focused on interfaces that center tactility and grounding. Open to senior and lead
+                    design roles in health, climate, and emerging tech.
+                </p>
+                <div class="mobile-contact__links">
+                    <a class="scene-arrow-link" href="projects/index.html">
+                        <span class="scene-arrow-link__label">See all work</span>
+                        <svg class="scene-arrow-link__arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <a class="scene-arrow-link" href="contact.html">
+                        <span class="scene-arrow-link__label">Let's work together</span>
+                        <svg class="scene-arrow-link__arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+            </section>
 
             <div class="work-rail-more">
                 <a class="scene-arrow-link" href="projects/index.html">
@@ -268,6 +307,20 @@
             </div>
         </main>
     </div>
+
+    <nav
+        class="mobile-overscroll-tray mobile-only"
+        id="mobile-overscroll-tray"
+        aria-label="Elsewhere"
+        aria-hidden="true"
+    >
+        <a href="cv.html">cv</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://www.are.na/pandji" target="_blank" rel="noopener noreferrer">are.na</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://github.com/apandji" target="_blank" rel="noopener noreferrer">github</a>
+        <span class="mobile-overscroll-tray__mark" aria-hidden="true">⁘</span>
+    </nav>
 
     <footer class="time-footer" role="contentinfo">
         <div class="time-footer__toy" id="footer-toy">
