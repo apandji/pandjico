@@ -4,7 +4,7 @@ Short checklist derived from [user-stories-and-scope.md](./user-stories-and-scop
 
 ## Tonight / first session back
 
-1. **Confirm GitHub Pages** — Repo should be live at `https://apandji.github.io/pandjico/` (see [github-pages.md](./github-pages.md)). Open the URL, click through projects, toggle the footer pin once.
+1. **Confirm GitHub Pages** — Site: **https://apandji.github.io/pandjico/** · Repo: **https://github.com/apandji/pandjico** · Settings → Pages should show **main** + **/ (root)**. Wait a minute after first deploy, then hard-refresh.
 2. **Custom domain (optional)** — If you use a domain later: repo **Settings → Pages → Custom domain**, then DNS CNAME to `apandji.github.io` (and remove `/pandjico` path or use apex rules as GitHub documents).
 
 ## Content (needs your words)
