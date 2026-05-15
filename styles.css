@@ -1002,7 +1002,7 @@ html[data-appearance="light"] .hero > p {
 }
 
 .hero-clients__group {
-    margin: var(--rhythm-md) 0 var(--rhythm-sm);
+    margin: var(--rhythm-md) 0 0;
     max-width: min(30em, var(--measure-prose));
     width: 100%;
 }
@@ -1036,9 +1036,9 @@ html[data-appearance="light"] .hero > p {
     max-width: min(30em, var(--measure-prose));
     font-size: var(--text-lede);
     line-height: var(--leading-prose);
-    margin-top: var(--rhythm-sm);
-    /* Both blurbs occupy the same box (absolute) — no max-height crossfade, so swapping logos doesn’t change layout. */
-    min-height: calc(4 * var(--leading-prose) * 1em);
+    margin-top: 0.35rem;
+    /* Blurbs are absolute — reserve ~3.5 lines so hover copy fits without a tall dead band above CTAs. */
+    min-height: calc(3.5 * var(--leading-prose) * 1em);
     overflow: hidden;
 }
 
@@ -1299,13 +1299,16 @@ html[data-appearance="light"] .sky-ui-chip {
 @media (max-width: 520px) {
     .time-footer__row {
         grid-template-columns: 1fr;
-        justify-items: center;
+        justify-items: stretch;
+    }
+
+    .time-footer__group-shell {
+        grid-column: 1;
     }
 
     .time-footer__group {
-        grid-column: 1;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .time-footer__extras {
@@ -1340,7 +1343,7 @@ html[data-appearance="light"] .sky-ui-chip {
 }
 
 .hero-cta {
-    margin: clamp(1.85rem, 2.8vw, 2.65rem) 0 0;
+    margin: clamp(0.65rem, 1.35vw, 1.1rem) 0 0;
     max-width: min(30em, var(--measure-prose));
     display: flex;
     flex-direction: column;
@@ -1537,7 +1540,8 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     z-index: 10;
     overflow: visible;
     isolation: isolate;
-    padding: clamp(1rem, 2.8vmin, 1.65rem) 1rem calc(var(--rhythm-sm) + env(safe-area-inset-bottom, 0px));
+    padding: clamp(1rem, 2.8vmin, 1.65rem) max(1rem, env(safe-area-inset-right, 0px))
+        calc(var(--rhythm-sm) + env(safe-area-inset-bottom, 0px)) max(0.65rem, env(safe-area-inset-left, 0px));
     font-size: calc(var(--text-meta) * 0.93);
     font-weight: 400;
     letter-spacing: 0.085em;
@@ -1554,7 +1558,7 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     );
     backdrop-filter: blur(22px) saturate(1.08);
     -webkit-backdrop-filter: blur(22px) saturate(1.08);
-    text-align: center;
+    text-align: left;
 }
 
 /* Extra strip above the bar: backdrop blur is masked to transparent → no hard rectangle */
@@ -1629,7 +1633,7 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
 .time-footer__inner {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 0.35rem;
     width: 100%;
     margin: 0;
@@ -1639,32 +1643,39 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
 
 .time-footer__row {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: start;
+    /* Pin + caption stay left within a full-width shell so string length changes do not re-center the block
+       (avoids the “shrinks from the middle” effect from 1fr | auto | 1fr on a width-changing middle track). */
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 0.55rem 0.75rem;
     width: 100%;
-    max-width: 48rem;
-    margin-inline: auto;
+    max-width: none;
+    margin-inline: 0;
     min-height: 2.85rem;
+}
+
+.time-footer__group-shell {
+    grid-column: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-start;
 }
 
 .time-footer__group {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.45rem 0.65rem;
-    grid-column: 2;
-    justify-self: center;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.18rem 0.28rem;
     max-width: 100%;
     min-width: 0;
 }
 
 .time-footer__extras {
-    grid-column: 3;
+    grid-column: 2;
     justify-self: end;
-    align-self: start;
+    align-self: center;
     min-width: 0;
     min-height: 0;
 }
@@ -1675,12 +1686,11 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     min-height: 0;
     margin: 0;
     padding: 0;
-    padding-top: 0.38rem;
-    font-size: calc(var(--text-meta) * 0.84);
+    font-size: calc(var(--text-meta) * 0.98);
     font-weight: 400;
     font-style: normal;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.035em;
+    letter-spacing: 0.028em;
     line-height: 1.5;
     text-transform: lowercase;
     text-align: left;
@@ -1693,10 +1703,9 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     display: inline-flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-start;
     gap: 0.35rem;
-    padding-top: 0.12rem;
 }
 
 .time-footer__sky-toggle {
@@ -1775,8 +1784,8 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
 .time-footer__lab {
     margin: 0;
     width: 100%;
-    max-width: 48rem;
-    text-align: center;
+    max-width: none;
+    text-align: left;
     font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
     font-size: calc(var(--text-meta) * 0.72);
     font-style: normal;
@@ -1794,7 +1803,7 @@ html[data-lab="1"] .time-footer__lab:not([hidden]) {
 
 .time-footer__geo-debug {
     width: 100%;
-    max-width: 48rem;
+    max-width: none;
     margin: 0;
     padding: 0.35rem 0 0;
     box-sizing: border-box;
@@ -1808,7 +1817,7 @@ html[data-lab="1"] .time-footer__lab:not([hidden]) {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.35rem 0.55rem;
 }
 
@@ -1863,7 +1872,7 @@ html[data-lab="1"] .time-footer__lab:not([hidden]) {
 }
 
 .time-footer__geo-debug-hint {
-    margin: 0.35rem auto 0;
+    margin: 0.35rem 0 0;
     max-width: 42rem;
     font-size: calc(var(--text-meta) * 0.68);
     font-style: normal;

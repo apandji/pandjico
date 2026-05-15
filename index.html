@@ -273,50 +273,52 @@
         <div class="time-footer__toy" id="footer-toy">
             <div class="time-footer__inner">
                 <div class="time-footer__row">
-                    <div class="time-footer__group">
-                        <div class="time-footer__sky-wrap">
-                            <p
-                                class="frost-tooltip sky-ui-chip"
-                                id="footer-toy-tip"
-                                role="tooltip"
-                            >
-                                <span class="frost-tooltip__text"
-                                    >site's colors change based on time of day; default is my home, st. louis, where this
-                                    site was crafted. click to use your own sky instead.</span>
-                            </p>
-                            <button
-                                type="button"
-                                class="time-footer__sky-toggle"
-                                id="footer-sky-toggle"
-                                aria-pressed="false"
-                                aria-label="Use your local sky instead of St. Louis"
-                            >
-                                <svg
-                                    class="time-footer__sky-svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    aria-hidden="true"
+                    <div class="time-footer__group-shell">
+                        <div class="time-footer__group">
+                            <div class="time-footer__sky-wrap">
+                                <p
+                                    class="frost-tooltip sky-ui-chip"
+                                    id="footer-toy-tip"
+                                    role="tooltip"
                                 >
-                                    <path
-                                        d="M20 10C20 14.4183 12 22 12 22C12 22 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                    ></path>
-                                    <path
-                                        d="M12 11C12.5523 11 13 10.5523 13 10C13 9.44772 12.5523 9 12 9C11.4477 9 11 9.44772 11 10C11 10.5523 11.4477 11 12 11Z"
-                                        fill="currentColor"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    ></path>
-                                </svg>
-                            </button>
+                                    <span class="frost-tooltip__text"
+                                        >site's colors change based on time of day; default is my home, st. louis, where this
+                                        site was crafted. click to use your own sky instead.</span>
+                                </p>
+                                <button
+                                    type="button"
+                                    class="time-footer__sky-toggle"
+                                    id="footer-sky-toggle"
+                                    aria-pressed="false"
+                                    aria-label="Use your local sky instead of St. Louis"
+                                >
+                                    <svg
+                                        class="time-footer__sky-svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M20 10C20 14.4183 12 22 12 22C12 22 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                        ></path>
+                                        <path
+                                            d="M12 11C12.5523 11 13 10.5523 13 10C13 9.44772 12.5523 9 12 9C11.4477 9 11 9.44772 11 10C11 10.5523 11.4477 11 12 11Z"
+                                            fill="currentColor"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="time-footer__caption" id="footer-caption"></p>
                         </div>
-                        <p class="time-footer__caption" id="footer-caption"></p>
                     </div>
                     <div
                         class="time-footer__extras"
