@@ -26,7 +26,7 @@ Open `http://127.0.0.1:3333/` — optional `?lab=1` / `?sceneDebug=1` for debug 
 
 - **HTTPS** — Geolocation and `navigator.clipboard` behave better than on `file://`.  
 - **Paths** — Relative assets (`css/`, `js/`; `../css/` from `projects/`) suit hosting under `/pandjico/`.  
-- **`adapt-hero.js`** — Loaded on the home page so `--bg-*` / `--fg-*` / accents apply before first paint; updates favicon + `theme-color`. Lab, scene debug, weather, and prose contrast live here — see [user-stories-and-scope.md](./user-stories-and-scope.md).  
+- **`adapt-hero.js`** — Loaded on the home page so `--bg-*` / `--fg-*` / accents apply before first paint; updates favicon + `theme-color`. Lab, scene debug, weather, and prose contrast live here — see [station-concept-and-critique.md](./station-concept-and-critique.md) Part Three.  
 - **Lab / debug** — Footer **⁘**: lab (click), scene debug (Shift+click), clear (Alt+click). URLs: `?lab=1|0`, `?sceneDebug=1|0`. `js/lab-egg.js` + `js/adapt-hero.js`.
 
 ## Service worker

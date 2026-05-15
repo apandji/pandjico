@@ -1,15 +1,17 @@
 /**
  * Frost tooltips (`.frost-tooltip`): footer sky hint only — borderless glass, backdrop blur.
  * Fine pointer: tip tracks cursor (below-right, flips when clipped). Keyboard / coarse: clamped
- * near the wrap.
+ * near the wrap. Tooltip text types in on show; box shrink-wraps to content width.
  */
 (function () {
     var pad = 12;
     var gap = 10;
     var cursorOffX = 14;
     var cursorOffY = 16;
-    var maxWpx = 400; /* keep in sync with footer `.frost-tooltip` width cap */
+    var maxWpx = 320;
     var anchorClass = "frost-tooltip--anchored";
+    var CHAR_MS = 36;
+    var TYPE_START_DELAY_MS = 60;
 
     var wraps = document.querySelectorAll(".time-footer__sky-wrap");
     if (!wraps.length) {
@@ -21,18 +23,26 @@
     var rafPlaceId = 0;
     var lastPx = 0;
     var lastPy = 0;
+    var tipTypeSession = 0;
+    var tipTypeTick = 0;
 
     function clamp(x, lo, hi) {
         return Math.max(lo, Math.min(hi, x));
     }
 
-    /** Max tooltip width: viewport cap. */
+    function reduceMotion() {
+        try {
+            return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function maxTooltipWidth(wrap, vw, pad) {
         var cap = vw - pad * 2;
         return Math.min(maxWpx, Math.max(96, cap));
     }
 
-    /** Horizontal bounds in viewport px for `position: fixed` tips. */
     function horizTipClamp(wrap, tw, pad) {
         var vw = window.innerWidth || 0;
         var minLeft = pad;
@@ -44,7 +54,6 @@
         return { minLeft: minLeft, maxLeft: maxLeft, innerRight: innerRight };
     }
 
-    /** Viewport `left`/`top` for `position: fixed` (hero). Under `.time-footer__sky-wrap`, anchored tips use `position: absolute` — convert to wrap-local coords. */
     function writeTipBox(tip, wrap, viewportLeft, viewportTop, widthPx) {
         var l = viewportLeft;
         var t = viewportTop;
@@ -55,32 +64,111 @@
         }
         tip.style.left = Math.round(l) + "px";
         tip.style.top = Math.round(t) + "px";
-        tip.style.width = widthPx + "px";
+        tip.style.width = Math.ceil(widthPx) + "px";
     }
 
     function getTip(wrap) {
         return wrap.querySelector(".frost-tooltip");
     }
 
-    /** Measure height with a definite width; leaves `.frost-tooltip--anchored` on. */
-    function measureTipHeight(tip, maxW) {
+    function tipFullText(tip) {
+        if (!tip) {
+            return "";
+        }
+        if (tip.dataset.tipText) {
+            return tip.dataset.tipText;
+        }
+        var textEl = tip.querySelector(".frost-tooltip__text");
+        return textEl ? textEl.textContent : "";
+    }
+
+    function ensureTipTypeNodes(tip) {
+        var textEl = tip.querySelector(".frost-tooltip__text");
+        var caretEl = tip.querySelector(".frost-tooltip__caret");
+        if (!textEl) {
+            textEl = document.createElement("span");
+            textEl.className = "frost-tooltip__text";
+            tip.insertBefore(textEl, tip.firstChild);
+        }
+        if (!caretEl) {
+            caretEl = document.createElement("span");
+            caretEl.className = "frost-tooltip__caret sky-cursor-type__caret";
+            caretEl.setAttribute("aria-hidden", "true");
+            tip.appendChild(caretEl);
+        }
+        return { textEl: textEl, caretEl: caretEl };
+    }
+
+    function cancelTipTypewriter() {
+        window.clearTimeout(tipTypeTick);
+        tipTypeTick = 0;
+        tipTypeSession += 1;
+    }
+
+    function startTipTypewriter(wrap, tip, onStep) {
+        cancelTipTypewriter();
+        var full = tipFullText(tip);
+        if (!full) {
+            return;
+        }
+        var nodes = ensureTipTypeNodes(tip);
+        var textEl = nodes.textEl;
+        var caretEl = nodes.caretEl;
+        var session = tipTypeSession;
+        textEl.textContent = "";
+        caretEl.classList.remove("sky-cursor-type__caret--done");
+
+        if (reduceMotion()) {
+            textEl.textContent = full;
+            caretEl.classList.add("sky-cursor-type__caret--done");
+            if (onStep) {
+                onStep();
+            }
+            return;
+        }
+
+        var i = 0;
+        function step() {
+            if (session !== tipTypeSession || openWrap !== wrap) {
+                return;
+            }
+            if (i >= full.length) {
+                caretEl.classList.add("sky-cursor-type__caret--done");
+                return;
+            }
+            textEl.textContent += full.charAt(i);
+            i += 1;
+            caretEl.classList.remove("sky-cursor-type__caret--done");
+            if (onStep) {
+                onStep();
+            }
+            tipTypeTick = window.setTimeout(step, CHAR_MS);
+        }
+
+        tipTypeTick = window.setTimeout(step, TYPE_START_DELAY_MS);
+    }
+
+    function measureTipSize(tip, maxW) {
         tip.classList.add(anchorClass);
         tip.style.left = "-9999px";
         tip.style.top = "0";
-        tip.style.width = maxW + "px";
+        tip.style.width = "max-content";
+        tip.style.maxWidth = maxW + "px";
         tip.style.opacity = "1";
         tip.style.visibility = "visible";
-        var th = tip.offsetHeight || 48;
+        var tw = tip.offsetWidth || 96;
+        var th = tip.offsetHeight || 32;
         tip.style.opacity = "";
         tip.style.visibility = "";
-        return th;
+        return { tw: tw, th: th };
     }
 
     function placeFromWrap(wrap, tip, maxW, vw, vh) {
         var wr = wrap.getBoundingClientRect();
-        var th = measureTipHeight(tip, maxW);
-        tip.style.width = "";
-        var tw = maxW;
+        var size = measureTipSize(tip, maxW);
+        var tw = size.tw;
+        var th = size.th;
+        tip.style.maxWidth = maxW + "px";
         var cx = wr.left + wr.width * 0.5;
         var left = cx - tw * 0.5;
         var hb = horizTipClamp(wrap, tw, pad);
@@ -95,15 +183,15 @@
         if (top < pad) {
             top = pad;
         }
-        writeTipBox(tip, wrap, left, top, maxW);
+        writeTipBox(tip, wrap, left, top, tw);
     }
 
     function placeFromCursor(wrap, tip, maxW, vw, vh, clientX, clientY) {
-        var th = measureTipHeight(tip, maxW);
-        tip.style.width = "";
-        var tw = maxW;
+        var size = measureTipSize(tip, maxW);
+        var tw = size.tw;
+        var th = size.th;
+        tip.style.maxWidth = maxW + "px";
         var hb = horizTipClamp(wrap, tw, pad);
-        /* Ride with the pointer: default anchor below–right of cursor. */
         var left = clientX + cursorOffX;
         var top = clientY + cursorOffY;
         if (left + tw > hb.innerRight) {
@@ -117,7 +205,7 @@
             top = pad;
         }
         top = clamp(top, pad, vh - th - pad);
-        writeTipBox(tip, wrap, left, top, maxW);
+        writeTipBox(tip, wrap, left, top, tw);
     }
 
     function place(wrap, clientX, clientY) {
@@ -146,6 +234,7 @@
     }
 
     function clear(wrap) {
+        cancelTipTypewriter();
         var tip = getTip(wrap);
         if (!tip) {
             return;
@@ -154,6 +243,7 @@
         tip.style.left = "";
         tip.style.top = "";
         tip.style.width = "";
+        tip.style.maxWidth = "";
         tip.style.opacity = "";
         tip.style.visibility = "";
     }
@@ -185,6 +275,23 @@
         });
     }
 
+    function openTip(wrap, clientX, clientY) {
+        var tip = getTip(wrap);
+        if (!tip) {
+            return;
+        }
+        var nodes = ensureTipTypeNodes(tip);
+        var full = tipFullText(tip);
+        if (full) {
+            nodes.textEl.textContent = full;
+            place(wrap, clientX, clientY);
+            nodes.textEl.textContent = "";
+        }
+        startTipTypewriter(wrap, tip, function () {
+            schedulePlace(wrap, clientX, clientY);
+        });
+    }
+
     document.addEventListener(
         "pointermove",
         function (e) {
@@ -201,6 +308,7 @@
         var btn = wrap.querySelector("#footer-sky-toggle");
         if (btn) {
             function suppressFooterTip() {
+                cancelTipTypewriter();
                 var tip = getTip(wrap);
                 if (tip) {
                     tip.classList.add("frost-tooltip--suppress-hover");
@@ -222,18 +330,7 @@
                 lastPy = e.clientY;
                 openWrap = wrap;
                 followPointer = e.pointerType === "mouse";
-                window.requestAnimationFrame(function () {
-                    window.requestAnimationFrame(function () {
-                        if (!isOpen(wrap)) {
-                            return;
-                        }
-                        if (followPointer) {
-                            place(wrap, e.clientX, e.clientY);
-                        } else {
-                            place(wrap);
-                        }
-                    });
-                });
+                openTip(wrap, e.clientX, e.clientY);
             },
             { passive: true },
         );
@@ -270,11 +367,7 @@
         wrap.addEventListener("focusin", function () {
             openWrap = wrap;
             followPointer = false;
-            window.requestAnimationFrame(function () {
-                if (isOpen(wrap)) {
-                    place(wrap);
-                }
-            });
+            openTip(wrap);
         });
 
         wrap.addEventListener("focusout", function (e) {

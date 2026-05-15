@@ -108,6 +108,8 @@
     --text-hero-wide: clamp(1.82rem, 0.92rem + 1.55vw, 2.58rem);
     --text-lede: clamp(0.9375rem, 0.86rem + 0.45vw, 1.035rem);
     --text-meta: 0.75rem;
+    /* Client blurbs, figure captions — just under meta; weight + tracking sell the tier */
+    --text-caption: clamp(0.74rem, 0.68rem + 0.22vw, 0.8rem);
     /* Glass tooltips / micro copy — one step below meta, slight viewport scaling */
     --text-tooltip: clamp(0.58rem, 0.5rem + 0.22vw, 0.68rem);
     --leading-hero: 1.13;
@@ -334,8 +336,6 @@ body {
 .work-rail {
     --rail-pad-x: max(1.5rem, env(safe-area-inset-left));
     --rail-pad-x-r: max(1.5rem, env(safe-area-inset-right));
-    --rail-tilt-x: 0deg;
-    --rail-tilt-y: 0deg;
     margin-left: var(--hero-col);
     box-sizing: border-box;
     min-height: 100vh;
@@ -346,14 +346,7 @@ body {
     flex-direction: column;
     gap: clamp(1.1rem, 2.8vw, 2.1rem);
     background-color: hsl(var(--bg-h) var(--bg-s) var(--bg-l));
-    perspective: 1200px;
-    perspective-origin: 44% 38%;
-    transform-style: preserve-3d;
-    transform: rotateX(var(--rail-tilt-x)) rotateY(var(--rail-tilt-y));
-    transition:
-        background-color 0.95s var(--ease-scene),
-        transform 0.22s var(--ease-out-natural);
-    will-change: transform;
+    transition: background-color 0.95s var(--ease-scene);
     position: relative;
 }
 
@@ -449,6 +442,10 @@ html[data-work-card-attention="1"] .work-card:not(.work-card--scroll-active):not
 }
 
 /* Opacity + transform on .work-card are set inline in work-cards.js so they win the cascade. */
+html[data-work-card-attention="1"] .work-card.work-card--scroll-active {
+    will-change: transform, opacity;
+}
+
 html[data-work-card-attention="1"] .work-card__figure {
     /* overflow:visible + filter drop-shadow was clipping against .work-card’s rounded overflow:hidden,
        producing rectangular halos / hard vertical edges; blur+saturate is enough for depth-of-field. */
@@ -456,6 +453,7 @@ html[data-work-card-attention="1"] .work-card__figure {
     border-radius: inherit;
     filter: blur(var(--card-scroll-blur)) saturate(var(--card-scroll-sat));
     -webkit-filter: blur(var(--card-scroll-blur)) saturate(var(--card-scroll-sat));
+    /* No CSS transition on filter — work-cards.js already eases values; avoids scroll “pumping”. */
 }
 
 html[data-work-card-attention="1"] .work-card.is-touch-open .work-card__figure {
@@ -533,8 +531,7 @@ html[data-appearance="dark"] .work-card {
     height: 100%;
     object-fit: cover;
     display: block;
-    /* Stable layer under .work-rail 3D tilt — bitmaps (e.g. Synek PNG) otherwise shimmer when the
-       rail transform updates while the pointer hovers outside the card. */
+    /* Composited layer — keeps bitmaps (e.g. Synek PNG) stable during scroll attention transforms. */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
@@ -1320,30 +1317,13 @@ html[data-appearance="light"] .scene-arrow-link:focus-visible {
     min-height: 0;
 }
 
-/* Masonry host: default rail tilt (unused when gallery uses `.works-masonry` — see override below). */
 .works-main.work-rail {
     margin-left: 0;
     max-width: 100%;
     min-height: 0;
     padding: 0;
-    perspective: 1200px;
-    perspective-origin: 50% 24%;
-    transform-style: preserve-3d;
-    transform: rotateX(var(--rail-tilt-x)) rotateY(var(--rail-tilt-y));
-    transition:
-        background-color 0.95s var(--ease-scene),
-        transform 0.22s var(--ease-out-natural);
-    will-change: transform;
     gap: 0;
     display: block;
-}
-
-/* Gallery: no 3D rail tilt — adapt-hero pointer tilt warps the grid and reads “broken”. */
-.works-main.work-rail:has(.works-masonry) {
-    perspective: none;
-    transform: none !important;
-    will-change: auto;
-    transform-style: flat;
 }
 
 /* Stable grid gallery: always 2–3 columns (never 1, never 4+). Native masonry rows where supported. */
@@ -1837,8 +1817,17 @@ html[data-appearance="light"] .hero {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     max-width: 100%;
-    text-wrap: balance;
+    hyphens: none;
+    -webkit-hyphens: none;
+    overflow-wrap: normal;
+    text-wrap: pretty;
     transition: color 0.95s var(--ease-scene);
+}
+
+@supports not (text-wrap: pretty) {
+    .hero h1 {
+        text-wrap: balance;
+    }
 }
 
 @media (min-width: 1080px) {
@@ -1928,13 +1917,23 @@ html[data-appearance="light"] .hero-name-link:focus-visible {
 .hero > p {
     margin: var(--rhythm-md) 0 0;
     max-width: min(30em, var(--measure-prose));
-    font-size: var(--text-lede);
+    /* Slightly below `--text-lede` max so the fixed column doesn’t overpower the h1. */
+    font-size: clamp(0.9375rem, 0.84rem + 0.38vw, 0.98rem);
     font-weight: 400;
     line-height: var(--leading-prose);
+    letter-spacing: 0.022em;
     color: hsl(var(--fg-h) var(--fg-s) var(--fg-l) / 0.94);
-    hyphens: auto;
-    -webkit-hyphens: auto;
+    hyphens: none;
+    -webkit-hyphens: none;
+    overflow-wrap: break-word;
+    word-break: normal;
+    text-wrap: pretty;
     transition: color 0.95s var(--ease-scene);
+}
+
+.hero > p strong {
+    font-weight: 500;
+    letter-spacing: 0.02em;
 }
 
 .hero > p:first-of-type {
@@ -1974,11 +1973,11 @@ html[data-appearance="light"] .hero-name-link:focus-visible {
     position: relative;
     width: 100%;
     max-width: min(30em, var(--measure-prose));
-    font-size: var(--text-lede);
-    line-height: var(--leading-prose);
+    font-size: var(--text-caption);
+    line-height: 1.48;
     margin-top: 0.35rem;
     /* Blurbs are absolute — reserve ~3.5 lines so hover copy fits without a tall dead band above CTAs. */
-    min-height: calc(3.5 * var(--leading-prose) * 1em);
+    min-height: calc(3.5 * 1.48 * 1em);
     overflow: hidden;
 }
 
@@ -2007,7 +2006,7 @@ html[data-appearance="light"] .hero-clients__link:focus-visible img {
     mix-blend-mode: normal;
 }
 
-/* Logo blurbs: meta tier — smaller + lower chroma than lede (adapt-hero `--meta-*`). */
+/* Logo blurbs: caption tier — smaller than lede/meta, medium weight, open tracking. */
 .hero-clients__blurb {
     position: absolute;
     left: 0;
@@ -2018,16 +2017,17 @@ html[data-appearance="light"] .hero-clients__link:focus-visible img {
     padding: 0;
     width: 100%;
     max-width: min(30em, var(--measure-prose));
-    font-size: 0.93em;
-    font-weight: 400;
+    font-size: inherit;
+    font-weight: 500;
     font-style: normal;
-    line-height: var(--leading-prose);
-    letter-spacing: 0.03em;
+    line-height: inherit;
+    letter-spacing: 0.062em;
     text-transform: none;
     text-align: left;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    color: hsl(var(--meta-h) var(--meta-s) var(--meta-l) / 0.9);
+    hyphens: none;
+    -webkit-hyphens: none;
+    text-wrap: pretty;
+    color: hsl(var(--meta-h) var(--meta-s) var(--meta-l) / 0.84);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -2040,6 +2040,7 @@ html[data-appearance="light"] .hero-clients__link:focus-visible img {
 
 .hero-clients__blurb strong {
     font-weight: 600;
+    letter-spacing: 0.055em;
 }
 
 .hero-clients__group[data-active-blurb="asc"] .hero-clients__blurb--asc,
@@ -2178,23 +2179,87 @@ html[data-appearance="light"] .sky-ui-chip {
     position: absolute;
     left: 50%;
     bottom: calc(100% + 0.45rem);
-    width: min(28rem, calc(100vw - 1.25rem));
+    box-sizing: border-box;
+    width: max-content;
+    max-width: min(20rem, calc(100vw - 1.25rem));
     transform: translate(-50%, 8px);
     z-index: 20;
     overflow: visible;
     isolation: isolate;
+    white-space: nowrap;
     transition:
         opacity 0.24s var(--ease-out-natural),
         transform 0.24s var(--ease-out-natural),
         visibility 0s linear 0.2s;
 }
 
+.time-footer__sky-wrap .frost-tooltip.sky-ui-chip.frost-tooltip--anchored {
+    transform: none;
+    white-space: nowrap;
+}
+
 .time-footer__sky-wrap .frost-tooltip.sky-ui-chip .frost-tooltip__text {
-    display: block;
+    display: inline;
     margin: 0;
     font-weight: 450;
     letter-spacing: 0.02em;
     color: inherit;
+}
+
+.time-footer__sky-wrap .frost-tooltip__caret {
+    display: inline-block;
+    vertical-align: -0.1em;
+}
+
+/* Footer caption intro: typewriter → hold → glitch into live clock (`adapt-hero.js`). */
+.footer-caption-type__text {
+    display: inline;
+}
+
+.footer-caption-type__caret {
+    display: inline-block;
+    vertical-align: -0.12em;
+}
+
+.time-footer__caption.footer-caption--glitch {
+    animation: footer-caption-glitch-jitter 0.11s steps(2, end) infinite;
+}
+
+.time-footer__caption.footer-caption--glitch .footer-caption-type__text {
+    text-shadow:
+        0.04em 0 hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.42),
+        -0.04em 0 hsl(var(--fg-h) var(--fg-s) calc(var(--fg-l) + 12%) / 0.28);
+}
+
+.time-footer__caption.footer-caption--fade-to-live {
+    opacity: 0.2;
+    transition: opacity 0.34s var(--ease-out-natural);
+}
+
+@keyframes footer-caption-glitch-jitter {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(-0.35px, 0.05px) skewX(-0.35deg);
+    }
+    50% {
+        transform: translate(0.4px, -0.05px) skewX(0.3deg);
+    }
+    75% {
+        transform: translate(-0.2px, 0.08px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .time-footer__caption.footer-caption--glitch {
+        animation: none;
+    }
+
+    .time-footer__caption.footer-caption--glitch .footer-caption-type__text {
+        text-shadow: none;
+    }
 }
 
 .time-footer__sky-wrap .frost-tooltip.frost-tooltip--suppress-hover,
@@ -2363,9 +2428,6 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     .work-rail,
     .works-main.work-rail {
         transition: none;
-        perspective: none;
-        transform: none;
-        will-change: auto;
     }
 
     .work-card {
@@ -2477,8 +2539,9 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     z-index: 10;
     overflow: visible;
     isolation: isolate;
-    padding: clamp(1rem, 2.8vmin, 1.65rem) max(1rem, env(safe-area-inset-right, 0px))
-        calc(var(--rhythm-sm) + env(safe-area-inset-bottom, 0px)) max(0.65rem, env(safe-area-inset-left, 0px));
+    padding: clamp(1rem, 2.8vmin, 1.65rem) max(var(--page-split-gutter), env(safe-area-inset-right, 0px))
+        calc(var(--rhythm-sm) + env(safe-area-inset-bottom, 0px))
+        max(var(--page-split-gutter), env(safe-area-inset-left, 0px));
     font-size: calc(var(--text-meta) * 0.93);
     font-weight: 400;
     letter-spacing: 0.085em;
@@ -2604,9 +2667,11 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 0.18rem 0.28rem;
+    gap: 0 0.625rem; /* ~10px between cloud and caption */
     max-width: 100%;
     min-width: 0;
+    /* Shared ink — caption + cloud read as one quiet line, not accent UI vs body copy. */
+    color: hsl(var(--meta-h) var(--meta-s) var(--meta-l) / 0.76);
 }
 
 .time-footer__extras {
@@ -2650,15 +2715,15 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     min-height: 0;
     margin: 0;
     padding: 0;
-    font-size: calc(var(--text-meta) * 0.98);
+    font-size: 0.9rem;
     font-weight: 400;
     font-style: normal;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.028em;
-    line-height: 1.5;
+    letter-spacing: 0.034em;
+    line-height: 1.62;
     text-transform: lowercase;
     text-align: left;
-    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.86);
+    color: inherit;
 }
 
 .time-footer__sky-wrap {
@@ -2669,27 +2734,31 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 0.35rem;
+    gap: 0;
 }
 
 .time-footer__sky-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.5rem;
-    min-height: 2.5rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 0;
+    min-height: 0;
     margin: 0;
-    padding: 0.25rem;
+    padding: 0;
     border: none;
     border-radius: 0.35rem;
-    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.88);
+    color: inherit;
     background: transparent;
     box-shadow: none;
     transition: opacity 0.2s var(--ease-out-natural), color 0.2s var(--ease-out-natural);
 }
 
 .time-footer__sky-toggle:hover {
-    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.98);
+    color: hsl(var(--meta-h) var(--meta-s) var(--meta-l) / 0.9);
 }
 
 .time-footer__sky-toggle:focus {
@@ -2703,38 +2772,36 @@ html[data-appearance="light"] .hero-cta__mini:focus-visible {
 
 .time-footer__sky-toggle svg {
     display: block;
-    width: 1.25rem;
-    height: 1.25rem;
-    opacity: 0.72;
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.58;
     transition:
         opacity 0.22s var(--ease-out-natural),
         fill 0.2s var(--ease-out-natural),
         stroke 0.2s var(--ease-out-natural);
 }
 
-/* STL: outline pin. Your sky: filled pin with center cutout. */
-.time-footer__sky-toggle[aria-pressed="false"] svg path:nth-of-type(1) {
+.time-footer__sky-toggle:hover svg {
+    opacity: 0.72;
+}
+
+/* STL: outline cloud. Your sky: filled cloud. */
+.time-footer__sky-toggle[aria-pressed="false"] svg path {
     fill: none;
     stroke: currentcolor;
 }
 
-.time-footer__sky-toggle[aria-pressed="false"] svg path:nth-of-type(2) {
-    fill: none;
-    stroke: currentcolor;
+.time-footer__sky-toggle[aria-pressed="true"] {
+    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.72);
 }
 
-.time-footer__sky-toggle[aria-pressed="true"] svg path:nth-of-type(1) {
+.time-footer__sky-toggle[aria-pressed="true"] svg path {
     fill: currentcolor;
     stroke: currentcolor;
 }
 
-.time-footer__sky-toggle[aria-pressed="true"] svg path:nth-of-type(2) {
-    fill: hsl(var(--bg-h) var(--bg-s) var(--bg-l));
-    stroke: currentcolor;
-}
-
 .time-footer__sky-toggle[aria-pressed="true"] svg {
-    opacity: 1;
+    opacity: 0.82;
 }
 
 .time-footer__sky-toggle:disabled svg {
@@ -2859,12 +2926,12 @@ html[data-appearance="light"] .time-footer {
     color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.52);
 }
 
-html[data-appearance="light"] .time-footer__caption {
-    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.84);
+html[data-appearance="light"] .time-footer__group {
+    color: hsl(var(--meta-h) var(--meta-s) var(--meta-l) / 0.68);
 }
 
-html[data-appearance="light"] .time-footer__sky-toggle {
-    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.88);
+html[data-appearance="light"] .time-footer__sky-toggle[aria-pressed="true"] {
+    color: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.66);
 }
 
 /* Scene scrubber — DOM is injected by adapt-hero.js only when scene debug is enabled. */
@@ -2951,7 +3018,7 @@ html[data-appearance="light"] .time-footer__sky-toggle {
     cursor: not-allowed;
 }
 
-/* One-session hint: typewriter near cursor (`sky-typewriter-hint.js`). */
+/* Cursor-adjacent chips (`cursor-typewriter-chip.js`). */
 .sky-cursor-type {
     position: fixed;
     left: 0;

@@ -79,12 +79,13 @@
 
     var root = document.documentElement;
     var smoothByEl = new WeakMap();
-    var SMOOTH = reduceMotion ? 0.22 : 0.16;
-    var BLUR_CAP = reduceMotion ? 2.25 : 6.5;
-    var EPS = 0.008;
+    var SMOOTH = reduceMotion ? 0.22 : 0.18;
+    var BLUR_CAP = reduceMotion ? 1.5 : 3.25;
+    var EPS = 0.01;
     var rafId = null;
     var scrollCoalesceRaf = null;
     var scrollListenersMounted = false;
+    var lastActiveIdx = -1;
 
     function getCardsArray() {
         var host = document.querySelector('[data-works-layout="masonry"]');
@@ -128,6 +129,36 @@
             /* ignore */
         }
         return vh * 0.5;
+    }
+
+    function offsetTopInRail(el, rail) {
+        var top = 0;
+        var node = el;
+        while (node && node !== rail) {
+            top += node.offsetTop;
+            node = node.offsetParent;
+        }
+        return top;
+    }
+
+    /** Layout-stable card boxes (ignore per-card scale/transform so focus doesn’t oscillate). */
+    function layoutRectsForCards(cards, rail) {
+        var railRect = rail.getBoundingClientRect();
+        var railTop = railRect.top;
+        var out = new Array(cards.length);
+        var i;
+        var el;
+        var h;
+        var top;
+        var bottom;
+        for (i = 0; i < cards.length; i++) {
+            el = cards[i];
+            h = el.offsetHeight || 1;
+            top = railTop + offsetTopInRail(el, rail);
+            bottom = top + h;
+            out[i] = { top: top, bottom: bottom, height: h };
+        }
+        return out;
     }
 
     function pickActiveIndex(cards, vh, rects) {
@@ -191,7 +222,7 @@
 
         if (i === activeIdx) {
             return {
-                sh: clamp((mid - vc) * -0.045, -5, 5),
+                sh: 0,
                 sc: focusScale,
                 op: 1,
                 bl: 0,
@@ -200,20 +231,20 @@
         }
 
         var pen = clamp(1 - w, 0, 1);
-        var blurBase = 2.1 + pen * 6.5;
+        var blurBase = 0.85 + pen * 2.4;
         var bl = Math.min(BLUR_CAP, blurBase);
         if (vis < 0.04 && pen < 0.2) {
             bl *= 0.5;
         }
-        var opLo = reduceMotion ? 0.55 : 0.32;
-        var opHi = reduceMotion ? 0.9 : 0.52;
-        var opMid = reduceMotion ? 0.86 - 0.28 * pen : 0.54 - 0.4 * pen;
+        var opLo = reduceMotion ? 0.55 : 0.38;
+        var opHi = reduceMotion ? 0.9 : 0.58;
+        var opMid = reduceMotion ? 0.86 - 0.28 * pen : 0.6 - 0.28 * pen;
         return {
-            sh: clamp((mid - vc) * -0.035, -4, 4),
-            sc: clamp(1 - pen * 0.055, 0.91, 1),
+            sh: 0,
+            sc: clamp(1 - pen * 0.045, 0.93, 1),
             op: clamp(opMid, opLo, opHi),
             bl: bl,
-            sat: clamp(1 - pen * 0.32, 0.62, 1),
+            sat: clamp(1 - pen * 0.18, 0.78, 1),
         };
     }
 
@@ -227,15 +258,18 @@
             return false;
         }
         ensureScrollListeners();
+        var rail = cards[0].closest(".work-rail") || cards[0].parentElement;
+        if (!rail) {
+            return false;
+        }
         var vh = window.innerHeight || 1;
         var focusScale = readFocusScale();
         var i;
-        var rects = new Array(cards.length);
-        for (i = 0; i < cards.length; i++) {
-            rects[i] = cards[i].getBoundingClientRect();
-        }
+        var rects = layoutRectsForCards(cards, rail);
         var activeIdx = pickActiveIndex(cards, vh, rects);
-        var k = instant ? 1 : SMOOTH;
+        var activeChanged = activeIdx !== lastActiveIdx;
+        lastActiveIdx = activeIdx;
+        var k = instant || activeChanged ? 1 : SMOOTH;
         var dirty = false;
         var el;
         var tgt;
@@ -249,7 +283,7 @@
 
             tgt = targetsForIndex(cards, i, activeIdx, vh, focusScale, rects[i]);
             sm = smoothByEl.get(el);
-            if (!sm || instant) {
+            if (!sm || instant || activeChanged) {
                 sm = { sh: tgt.sh, sc: tgt.sc, op: tgt.op, bl: tgt.bl, sat: tgt.sat };
                 smoothByEl.set(el, sm);
             } else {
@@ -260,18 +294,17 @@
                 sm.sat = stepToward(sm.sat, tgt.sat, k);
             }
 
-            var op = clamp(sm.op, 0.14, 1);
-            el.style.setProperty("--card-scroll-shift", sm.sh.toFixed(2) + "px");
+            var op = clamp(sm.op, 0.2, 1);
+            el.style.setProperty("--card-scroll-shift", "0px");
             el.style.setProperty("--card-scroll-scale", sm.sc.toFixed(4));
             el.style.setProperty("--card-scroll-opacity", op.toFixed(3));
             el.style.setProperty("--card-scroll-blur", sm.bl.toFixed(2) + "px");
             el.style.setProperty("--card-scroll-sat", clamp(sm.sat, 0.62, 1).toFixed(3));
             el.style.opacity = String(op);
-            el.style.transform = "translate3d(" + sm.sh.toFixed(2) + "px, 0, 0) scale(" + sm.sc.toFixed(4) + ")";
+            el.style.transform = "translate3d(0, 0, 0) scale(" + sm.sc.toFixed(4) + ")";
 
-            if (!instant) {
+            if (!instant && !activeChanged) {
                 d = Math.max(
-                    Math.abs(tgt.sh - sm.sh),
                     Math.abs(tgt.sc - sm.sc),
                     Math.abs(tgt.op - sm.op),
                     Math.abs(tgt.bl - sm.bl),
@@ -313,6 +346,7 @@
             window.cancelAnimationFrame(scrollCoalesceRaf);
             scrollCoalesceRaf = null;
         }
+        lastActiveIdx = -1;
         tick(true);
         scheduleFollowUp();
     }

@@ -77,7 +77,6 @@
     applyLabDataset();
     var hero = document.querySelector(".hero");
     var pageSplit = document.querySelector(".page-split");
-    var workRail = document.querySelector(".work-rail");
 
     var FOOTER_ANCHOR_KEY = "footerAnchor";
     var FOOTER_GEO_LAT_KEY = "footerGeoLat";
@@ -88,6 +87,19 @@
     var FOOTER_GEO_LAB_CAPTION_TZ_KEY = "footerGeoLabCaptionTz";
     var FOOTER_GEO_DEBUG_LAT_KEY = "footerGeoDebugLat";
     var FOOTER_GEO_DEBUG_LON_KEY = "footerGeoDebugLon";
+    var FOOTER_CAPTION_INTRO_KEY = "pandjiFooterCaptionIntroDismissed";
+    var FOOTER_INTRO_LINE =
+        "This site take readings, with colors shifting to match the rhythm of the day.";
+    var FOOTER_SKY_TOOLTIP_DEFAULT = "Use my own sky instead";
+    var FOOTER_CAPTION_TYPE_CHAR_MS = 34;
+    var FOOTER_CAPTION_INTRO_HOLD_MS = 5200;
+    var FOOTER_CAPTION_GLITCH_MS = 1120;
+    var FOOTER_CAPTION_GLITCH_STEPS = 36;
+    var FOOTER_GLITCH_CHARSET = "·:;|/\\{}[]?+=-_…—░▒▓×÷•0123456789";
+    var footerCaptionIntroTimer = null;
+    var footerCaptionTypeTick = 0;
+    var footerCaptionIntroRunning = false;
+    var footerCaptionIntroStarted = false;
     var STL_LAT = 38.627;
     var STL_LON = -90.1994;
     var STL_TZ = "America/Chicago";
@@ -1657,13 +1669,77 @@
         return Math.abs(lat).toFixed(2) + "\u00b0" + ns + " " + Math.abs(lon).toFixed(2) + "\u00b0" + ew;
     }
 
-    function updateFooterCaption(clockH) {
-        void clockH;
-        var cap = document.getElementById("footer-caption");
-        var labEl = document.getElementById("footer-lab");
-        if (!cap) {
-            return;
+    function readFooterCaptionIntroDismissed() {
+        try {
+            return window.sessionStorage.getItem(FOOTER_CAPTION_INTRO_KEY) === "1";
+        } catch (eIntroRead) {
+            return false;
         }
+    }
+
+    function shouldShowFooterCaptionIntro() {
+        if (readFooterCaptionIntroDismissed()) {
+            return false;
+        }
+        if (readFooterAnchorMode() === "here" && readStoredGeoCoords()) {
+            return false;
+        }
+        return true;
+    }
+
+    function cancelFooterCaptionIntroAnimations() {
+        window.clearTimeout(footerCaptionTypeTick);
+        footerCaptionTypeTick = 0;
+        if (footerCaptionIntroTimer) {
+            window.clearTimeout(footerCaptionIntroTimer);
+            footerCaptionIntroTimer = null;
+        }
+        footerCaptionIntroRunning = false;
+        var capStop = document.getElementById("footer-caption");
+        if (capStop) {
+            capStop.classList.remove("footer-caption--glitch", "footer-caption--fade-to-live");
+        }
+    }
+
+    function markFooterCaptionIntroDismissed() {
+        try {
+            window.sessionStorage.setItem(FOOTER_CAPTION_INTRO_KEY, "1");
+        } catch (eIntroWrite) {
+            /* ignore */
+        }
+    }
+
+    function footerCaptionIntroReducedMotion() {
+        try {
+            return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        } catch (eRm) {
+            return false;
+        }
+    }
+
+    function footerCaptionGlitchEase(t) {
+        return t * t * (3 - 2 * t);
+    }
+
+    function ensureFooterCaptionTypeNodes(cap) {
+        var textEl = cap.querySelector(".footer-caption-type__text");
+        var caretEl = cap.querySelector(".footer-caption-type__caret");
+        if (!textEl) {
+            textEl = document.createElement("span");
+            textEl.className = "footer-caption-type__text";
+            cap.appendChild(textEl);
+        }
+        if (!caretEl) {
+            caretEl = document.createElement("span");
+            caretEl.className = "footer-caption-type__caret sky-cursor-type__caret";
+            caretEl.setAttribute("aria-hidden", "true");
+            cap.appendChild(caretEl);
+        }
+        return { textEl: textEl, caretEl: caretEl };
+    }
+
+    function buildFooterCaptionText(clockH) {
+        void clockH;
         var now = new Date();
         var tz = effectiveSceneTimeZone();
         var wd = new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short" })
@@ -1761,8 +1837,203 @@
         } else {
             core += " in " + place;
         }
+        return core;
+    }
+
+    function runFooterCaptionGlitch(cap, textEl, from, to, onDone) {
+        var pool = FOOTER_GLITCH_CHARSET + from + to;
+        var step = 0;
+        var stepMs = Math.max(16, Math.round(FOOTER_CAPTION_GLITCH_MS / FOOTER_CAPTION_GLITCH_STEPS));
+        cap.classList.add("footer-caption--glitch");
+
+        function glitchChar() {
+            return pool.charAt(Math.floor(Math.random() * pool.length));
+        }
+
+        function frame() {
+            if (!footerCaptionIntroRunning) {
+                cap.classList.remove("footer-caption--glitch");
+                return;
+            }
+            step += 1;
+            var t = footerCaptionGlitchEase(Math.min(1, step / FOOTER_CAPTION_GLITCH_STEPS));
+            var fromLen = from.length;
+            var toLen = to.length;
+            var len = Math.max(1, Math.round(fromLen + (toLen - fromLen) * t));
+            var reveal = Math.floor(t * (toLen + 8));
+            var out = "";
+            var j;
+            for (j = 0; j < len; j++) {
+                if (j < reveal && j < toLen) {
+                    out += to.charAt(j);
+                } else if (j < toLen && Math.random() < t * 0.72) {
+                    out += to.charAt(j);
+                } else {
+                    out += glitchChar();
+                }
+            }
+            textEl.textContent = out;
+            if (step >= FOOTER_CAPTION_GLITCH_STEPS) {
+                cap.classList.remove("footer-caption--glitch");
+                textEl.textContent = to;
+                onDone();
+                return;
+            }
+            footerCaptionTypeTick = window.setTimeout(frame, stepMs);
+        }
+
+        frame();
+    }
+
+    function transitionFooterCaptionIntroToLive(skipGlitch) {
+        var cap = document.getElementById("footer-caption");
+        if (!cap) {
+            markFooterCaptionIntroDismissed();
+            footerCaptionIntroRunning = false;
+            updateFooterCaption(clockHourFloat());
+            return;
+        }
+        window.clearTimeout(footerCaptionIntroTimer);
+        footerCaptionIntroTimer = null;
+        window.clearTimeout(footerCaptionTypeTick);
+        footerCaptionTypeTick = 0;
+
+        var target = buildFooterCaptionText(clockHourFloat());
+        var nodes = ensureFooterCaptionTypeNodes(cap);
+        var textEl = nodes.textEl;
+        var caretEl = nodes.caretEl;
+        var from = textEl.textContent || FOOTER_INTRO_LINE;
+        caretEl.classList.add("sky-cursor-type__caret--done");
+
+        if (skipGlitch || footerCaptionIntroReducedMotion()) {
+            if (footerCaptionIntroReducedMotion() && !skipGlitch) {
+                cap.classList.add("footer-caption--fade-to-live");
+                footerCaptionIntroTimer = window.setTimeout(function () {
+                    cap.classList.remove("footer-caption--fade-to-live");
+                    markFooterCaptionIntroDismissed();
+                    footerCaptionIntroRunning = false;
+                    updateFooterCaption(clockHourFloat());
+                }, 360);
+                return;
+            }
+            markFooterCaptionIntroDismissed();
+            footerCaptionIntroRunning = false;
+            updateFooterCaption(clockHourFloat());
+            return;
+        }
+
+        footerCaptionIntroRunning = true;
+        runFooterCaptionGlitch(cap, textEl, from, target, function () {
+            markFooterCaptionIntroDismissed();
+            footerCaptionIntroRunning = false;
+            updateFooterCaption(clockHourFloat());
+        });
+    }
+
+    function dismissFooterCaptionIntro(skipGlitch) {
+        transitionFooterCaptionIntroToLive(!!skipGlitch);
+    }
+
+    function runFooterCaptionIntroSequence() {
+        var cap = document.getElementById("footer-caption");
+        if (!cap || !shouldShowFooterCaptionIntro()) {
+            return;
+        }
+        cancelFooterCaptionIntroAnimations();
+        footerCaptionIntroRunning = true;
+        cap.replaceChildren();
+        var nodes = ensureFooterCaptionTypeNodes(cap);
+        var textEl = nodes.textEl;
+        var caretEl = nodes.caretEl;
+        textEl.textContent = "";
+        caretEl.classList.remove("sky-cursor-type__caret--done");
+
+        function holdThenGlitch() {
+            if (!footerCaptionIntroRunning) {
+                return;
+            }
+            caretEl.classList.add("sky-cursor-type__caret--done");
+            var holdMs = footerCaptionIntroReducedMotion()
+                ? Math.min(FOOTER_CAPTION_INTRO_HOLD_MS, 4200)
+                : FOOTER_CAPTION_INTRO_HOLD_MS;
+            footerCaptionIntroTimer = window.setTimeout(function () {
+                transitionFooterCaptionIntroToLive(false);
+            }, holdMs);
+        }
+
+        if (footerCaptionIntroReducedMotion()) {
+            textEl.textContent = FOOTER_INTRO_LINE;
+            holdThenGlitch();
+            return;
+        }
+
+        var idx = 0;
+        function typeStep() {
+            if (!footerCaptionIntroRunning) {
+                return;
+            }
+            if (idx >= FOOTER_INTRO_LINE.length) {
+                holdThenGlitch();
+                return;
+            }
+            textEl.textContent += FOOTER_INTRO_LINE.charAt(idx);
+            idx += 1;
+            caretEl.classList.remove("sky-cursor-type__caret--done");
+            footerCaptionTypeTick = window.setTimeout(typeStep, FOOTER_CAPTION_TYPE_CHAR_MS);
+        }
+        typeStep();
+    }
+
+    function scheduleFooterCaptionIntro() {
+        if (!shouldShowFooterCaptionIntro() || footerCaptionIntroStarted) {
+            return;
+        }
+        footerCaptionIntroStarted = true;
+        runFooterCaptionIntroSequence();
+    }
+
+    function syncFooterSkyTooltip(trackingOverride) {
+        var tipRoot = document.getElementById("footer-toy-tip");
+        var textEl = tipRoot && tipRoot.querySelector(".frost-tooltip__text");
+        if (!textEl) {
+            return;
+        }
+        var hereOn = readFooterAnchorMode() === "here" && !!readStoredGeoCoords();
+        var full;
+        if (hereOn || trackingOverride) {
+            var slug =
+                trackingOverride != null && String(trackingOverride).trim()
+                    ? String(trackingOverride).trim()
+                    : trackingPlaceSlug();
+            full = "tracking " + slug + "...";
+        } else {
+            full = FOOTER_SKY_TOOLTIP_DEFAULT;
+        }
+        tipRoot.dataset.tipText = full;
+        textEl.textContent = full;
+    }
+
+    function updateFooterCaption(clockH) {
+        var cap = document.getElementById("footer-caption");
+        var labEl = document.getElementById("footer-lab");
+        if (!cap) {
+            return;
+        }
+        if (shouldShowFooterCaptionIntro() || footerCaptionIntroRunning) {
+            if (shouldShowFooterCaptionIntro() && !footerCaptionIntroStarted) {
+                scheduleFooterCaptionIntro();
+            }
+            if (labEl) {
+                labEl.setAttribute("hidden", "");
+                labEl.textContent = "";
+                labEl.setAttribute("aria-hidden", "true");
+            }
+            return;
+        }
+        var core = buildFooterCaptionText(clockH);
         cap.replaceChildren();
         cap.appendChild(document.createTextNode(core));
+        footerCaptionIntroStarted = false;
 
         if (labEl) {
             if (labPlaygroundEnabled()) {
@@ -1783,6 +2054,7 @@
     function syncFooterSkyToggle() {
         var btn = document.getElementById("footer-sky-toggle");
         if (!btn) {
+            syncFooterSkyTooltip();
             return;
         }
         var hereOn = readFooterAnchorMode() === "here" && !!readStoredGeoCoords();
@@ -1796,6 +2068,7 @@
             );
         }
         btn.removeAttribute("title");
+        syncFooterSkyTooltip();
     }
 
     function clearGeoPlaceCache() {
@@ -1814,14 +2087,6 @@
         return String(c).replace(/,/g, " ").replace(/\s+/g, " ").trim();
     }
 
-    function fireTrackingChip(clientX, clientY, slugOverride) {
-        if (typeof window.showCursorTypewriterChip !== "function") {
-            return;
-        }
-        var slug = slugOverride != null ? String(slugOverride).trim() : trackingPlaceSlug();
-        window.showCursorTypewriterChip("tracking " + slug, clientX, clientY);
-    }
-
     function initFooterSkyToggle() {
         normalizeFooterAnchorState();
         var btn = document.getElementById("footer-sky-toggle");
@@ -1829,9 +2094,8 @@
         if (!btn) {
             return;
         }
-        btn.addEventListener("click", function (ev) {
-            var ax = ev.clientX;
-            var ay = ev.clientY;
+        btn.addEventListener("click", function () {
+            dismissFooterCaptionIntro(true);
             var hereOn = readFooterAnchorMode() === "here" && !!readStoredGeoCoords();
             if (hereOn) {
                 writeFooterAnchorMode("stl");
@@ -1839,7 +2103,6 @@
                 lastWeatherAttempt = 0;
                 lastWeatherTempF = null;
                 tick();
-                fireTrackingChip(ax, ay, "stl");
                 return;
             }
             var cached = readStoredGeoCoords();
@@ -1849,7 +2112,6 @@
                 lastWeatherAttempt = 0;
                 lastWeatherTempF = null;
                 tick();
-                fireTrackingChip(ax, ay, null);
                 return;
             }
             if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
@@ -1868,6 +2130,7 @@
                 );
             }
             btn.disabled = true;
+            syncFooterSkyTooltip("your location");
             navigator.geolocation.getCurrentPosition(
                 function (pos) {
                     clearGeoPlaceCache();
@@ -1876,13 +2139,12 @@
                     btn.disabled = false;
                     lastWeatherAttempt = 0;
                     lastWeatherTempF = null;
+                    syncFooterSkyTooltip();
                     tick();
-                    window.setTimeout(function () {
-                        fireTrackingChip(ax, ay, null);
-                    }, 1000);
                 },
                 function (err) {
                     btn.disabled = false;
+                    syncFooterSkyTooltip();
                     var why = "unknown";
                     if (err && typeof err.code === "number") {
                         if (err.code === 1) {
@@ -1906,7 +2168,6 @@
 
     function tick() {
         hero = document.querySelector(".hero");
-        workRail = document.querySelector(".work-rail");
         var hour = clockHourFloat();
         applyScene(hour);
         updateSceneLegibility(hour);
@@ -1921,11 +2182,11 @@
 
     function bindDomDependentChrome() {
         hero = document.querySelector(".hero");
-        workRail = document.querySelector(".work-rail");
         initFooterSkyToggle();
         ensureFooterGeoDebugWired();
         syncFooterGeoDebugPanel();
         refreshGeoDebugInputsFromStorage();
+        scheduleFooterCaptionIntro();
         tick();
     }
 
@@ -1946,135 +2207,18 @@
         });
     }
 
-    function initHeroPointerInteractions() {
-        hero = document.querySelector(".hero");
-        workRail = document.querySelector(".work-rail");
-        if (!hero || reduceMotion) {
-            return;
-        }
-
-        var scheduled = false;
-        var x = 0;
-        var y = 0;
-
-        var TILT_MAX_X = 3.8;
-        var TILT_MAX_Y = 5.2;
-
-        function applyPointerSpatial() {
-            scheduled = false;
-            var w = window.innerWidth || 1;
-            var h = window.innerHeight || 1;
-            var nx = x / w;
-            var ny = y / h;
-            var rdx = (0.5 - ny) * 2 * TILT_MAX_X;
-            var rdy = (nx - 0.5) * 2 * TILT_MAX_Y;
-            if (workRail) {
-                workRail.style.setProperty("--rail-tilt-x", rdx.toFixed(2) + "deg");
-                workRail.style.setProperty("--rail-tilt-y", rdy.toFixed(2) + "deg");
-            }
-        }
-
-        function scheduleSpatialFromClient(cx, cy) {
-            x = cx;
-            y = cy;
-            if (scheduled) {
-                return;
-            }
-            scheduled = true;
-            requestAnimationFrame(applyPointerSpatial);
-        }
-
-        function onFinePointerMove(event) {
-            scheduleSpatialFromClient(event.clientX, event.clientY);
-        }
-
-        if (finePointer) {
-            window.addEventListener("pointermove", onFinePointerMove, { passive: true });
-            return;
-        }
-
-        var COARSE_MOVE_PX = 14;
-        var VERTICAL_DOMINANCE = 1.15;
-        var tracking = null;
-
-        function endCoarseTracking(ev) {
-            if (!tracking || ev.pointerId !== tracking.pointerId) {
-                return;
-            }
-            if (tracking.captured) {
-                try {
-                    hero.releasePointerCapture(tracking.pointerId);
-                } catch (err) {
-                    /* ignore */
-                }
-            }
-            tracking = null;
-        }
-
-        function onHeroPointerDown(ev) {
-            if (tracking || ev.isPrimary === false) {
-                return;
-            }
-            if (ev.pointerType === "mouse") {
-                return;
-            }
-            tracking = {
-                pointerId: ev.pointerId,
-                sx: ev.clientX,
-                sy: ev.clientY,
-                mode: "undecided",
-                captured: false,
-            };
-        }
-
-        function onCoarsePointerMove(ev) {
-            if (!tracking || ev.pointerId !== tracking.pointerId) {
-                return;
-            }
-            var dx = ev.clientX - tracking.sx;
-            var dy = ev.clientY - tracking.sy;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-            if (tracking.mode === "undecided") {
-                if (dist < COARSE_MOVE_PX) {
-                    return;
-                }
-                if (Math.abs(dy) > Math.abs(dx) * VERTICAL_DOMINANCE) {
-                    tracking = null;
-                    return;
-                }
-                tracking.mode = "tilt";
-                try {
-                    hero.setPointerCapture(ev.pointerId);
-                    tracking.captured = true;
-                } catch (err) {
-                    /* ignore */
-                }
-            }
-            if (tracking && tracking.mode === "tilt") {
-                scheduleSpatialFromClient(ev.clientX, ev.clientY);
-            }
-        }
-
-        hero.addEventListener("pointerdown", onHeroPointerDown, { passive: true });
-        window.addEventListener("pointermove", onCoarsePointerMove, { passive: true });
-        window.addEventListener("pointerup", endCoarseTracking, { passive: true });
-        window.addEventListener("pointercancel", endCoarseTracking, { passive: true });
-    }
-
     if (document.readyState === "loading") {
         tick();
         document.addEventListener(
             "DOMContentLoaded",
             function () {
                 bindDomDependentChrome();
-                initHeroPointerInteractions();
                 startPeriodicTimers();
             },
             { once: true },
         );
     } else {
         bindDomDependentChrome();
-        initHeroPointerInteractions();
         startPeriodicTimers();
     }
 })();

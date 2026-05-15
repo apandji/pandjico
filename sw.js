@@ -4,7 +4,7 @@
  * Bump STATIC_CACHE (and optionally RUNTIME_CACHE) whenever you change precached files
  * so clients drop old entries. See README + docs/github-pages.md.
  */
-var STATIC_CACHE = "pandjico-static-35";
+var STATIC_CACHE = "pandjico-static-42";
 var RUNTIME_CACHE = "pandjico-runtime-1";
 
 /** Paths relative to the service worker scope (site root). */
@@ -24,7 +24,6 @@ var PRECACHE_REL = [
     "js/works-index.js",
     "js/hero-client-blurbs.js",
     "js/frost-tooltip.js",
-    "js/sky-typewriter-hint.js",
     "fonts/Ronzino-Regular.woff2",
     "fonts/Ronzino-Oblique.woff2",
     "fonts/Ronzino-Medium.woff2",

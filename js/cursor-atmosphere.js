@@ -3,8 +3,7 @@
  * Scene color stays time-led (adapt-hero.js); pointer moves wash position, grain offset, and wash L a few points.
  *
  * Radial `at X% Y%` is relative to the hero panel — map the cursor into that box (not raw viewport %).
- * The work rail uses 3D tilt (`perspective` + `rotateX`/`rotateY`); grain + radial there caused moiré/shimmer,
- * so atmosphere is hero-only.
+ * Atmosphere is hero-only (grain + radial on the panel, not the work rail).
  */
 (function () {
     var root = document.documentElement;
